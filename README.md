@@ -1,0 +1,2 @@
+# CVCTW-TransNook
+Translation "nook"
