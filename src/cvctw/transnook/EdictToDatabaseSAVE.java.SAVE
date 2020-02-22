@@ -1,0 +1,159 @@
+/**
+ * 
+ */
+package cvctw.transnook;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.ArrayList;
+
+import cvctw.db.transnook.TnConnection;
+import cvctw.db.transnook.TnProp;
+import cvctw.db.transnook.TnRowReader;
+import cvctw.db.transnook.TnRowWriter;
+import cvctw.db.transnook.TnStaticTable;
+import cvctw.edict.Dictionary;
+import cvctw.edict.EdictMeaning;
+import cvctw.edict.EdictEntry;
+import cvctw.edict.EdictReader;
+import cvctw.edict.EdictTerm;
+
+/**
+ * @author minge
+ *
+ */
+public class EdictToDatabaseSAVE {
+
+	private ArrayList<String> eDictContents = null;
+	private ArrayList<EdictEntry> dictEntries = null;
+	private Connection conn = null;
+	private TnRowReader rowReader = null;
+	private TnRowWriter rowWriter = null;
+	private TnStaticTable staticTable = null;
+
+	EdictToDatabaseSAVE(String eDictPath, String propPath) throws IOException, FileNotFoundException, SQLException {
+		EdictReader r = new EdictReader(eDictPath);
+		eDictContents = r.getContents();
+		System.out.println("EdictReader contents.size=" + eDictContents.size());
+		Dictionary d = new Dictionary(eDictContents);
+		dictEntries = d.getEntries();
+		System.out.println("Dictionary entries.size=" + dictEntries.size());
+		makeTools(propPath);
+	}
+
+	private void makeTools(String propPath) throws SQLException, FileNotFoundException, IOException {
+		conn = new TnConnection(propPath).tnConnDataSource();
+		rowReader = new TnRowReader(conn);
+		rowWriter = new TnRowWriter(conn);
+		staticTable = new TnStaticTable(rowReader, rowWriter);
+	}
+
+	public void dictToDb() throws SQLException, Exception {
+		for (EdictEntry dE : dictEntries) {
+			putEntry(dE);
+		}
+	}
+
+	private void putEntry(EdictEntry dE) throws SQLException, Exception {
+		// Escape any apostrophes in the entry
+		String newEntry = dE.entry.replaceAll("'", "''");
+		dE.entry = newEntry;
+		// Convert enum "source" to char
+		char source = dE.source.toString().charAt(0);
+		// If the language is missing in its static table, insert it
+		staticTable.insertIfMissing(TnProp.TABLE_LANGUAGES, dE.language);
+		// Insert parent Entry record, capture its new ID
+		Integer entryId = rowWriter.writeEntry(dE, source);
+		// Insert child Term records
+		for (EdictTerm t : dE.terms) {
+			putTerm(t, entryId);
+		}
+		// Insert child Definition records
+		for (EdictMeaning d : dE.definitions) {
+			Integer defId = putDefinition(d, entryId);
+			putDefAttributes(d.contexts, defId, 
+					TnProp.TABLE_CONTEXTS, TnProp.COLUMN_CONTEXTS, TnProp.TABLE_CONTEXTS2DEFS);
+			putDefAttributes(d.partsOfSpeech, defId, 
+					TnProp.TABLE_PARTSOFSPEECH, TnProp.COLUMN_PARTSOFSPEECH, TnProp.TABLE_PARTSOFSPEECH2DEFS);
+			putDefAttributes(d.senses, defId, 
+					TnProp.TABLE_SENSES, TnProp.COLUMN_SENSES, TnProp.TABLE_SENSES2DEFS);
+			putDefAttributes(d.dialects, defId, 
+					TnProp.TABLE_DIALECTS, TnProp.COLUMN_DIALECTS, TnProp.TABLE_DIALECTS2DEFS);
+		}
+	}
+
+	private void putTerm(EdictTerm t, Integer entryId) throws SQLException, Exception {
+		// Escape any apostrophes in the term (unlikely, but possible
+		String newTerm = t.term.replaceAll("'", "''");
+		t.term = newTerm;
+		// If the alphabet is missing in its static table, insert it
+		staticTable.insertIfMissing(TnProp.TABLE_ALPHABETS, t.alphabet.toString());
+		// Get the parent Entry's id
+		t.entryId = entryId;
+		// Insert Term
+		rowWriter.writeTerm(t);
+	}
+
+	/**
+	 * 
+	 * @param d
+	 * @param entryId
+	 * @return
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	private Integer putDefinition(EdictMeaning d, Integer entryId) throws SQLException, Exception {
+		// Escape any apostrophes in the meaning
+		String newDef = d.meaning.replaceAll("'", "''");
+		d.meaning = newDef;
+		// If the Definition's language is missing in its static table, insert it
+		staticTable.insertIfMissing(TnProp.TABLE_LANGUAGES, d.language);
+		// Get the parent Entry's id
+		d.entryId = entryId;
+		// Insert Definition and save its new id
+		Integer defId = rowWriter.writeDefinition(d);
+		return defId;
+	}
+
+	/**
+	 * 
+	 * @param attributesArray
+	 * @param defId
+	 * @param table
+	 * @param column
+	 * @param att2defTable
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	private void putDefAttributes(ArrayList<String> attributesArray, Integer defId,
+			String table, String column, String att2defTable) throws SQLException, Exception {
+		// If the meaning has none of these Attrobites, no problem.  Just return happy.
+		if (attributesArray == null) {
+			return;
+		}
+		// Insert the Definition's child Attribute records
+		for (String attribute : attributesArray) {
+			// If the Attribute is missing in its static table, insert it
+			staticTable.insertIfMissing(table, attribute);
+			// Link this Attribute to this Definition
+			rowWriter.writeAttrToMeaning(att2defTable, column, attribute, defId);
+		}
+	}
+
+	/**
+	 * @param args
+	 * @throws IOException 
+	 * @throws SQLException 
+	 */
+	public static void main(String[] args) throws IOException, SQLException, Exception {
+		if (args.length < 2) {
+			System.out.println("Missing argument: eDictFilePath propertiesFilePath");
+			System.exit(-1);
+		}
+		EdictToDatabase eD = new EdictToDatabase(args[0], args[1]);
+		eD.dictToDb();
+	}
+
+}
