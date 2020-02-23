@@ -31,12 +31,6 @@ public class TnRowWriter {
 				" (entry,language,eDictId,source) VALUES ('" +
 				e.entry + "','" + e.language + "','" + e.eDictId + "','" + source + "')";
 		tnConn.tnExecuteStatement(inst, TnStatementType.UPDATE);
-//		System.out.println("new INSERT: " + inst);
-//		Statement st = conn.createStatement();
-//		int stat = st.executeUpdate(inst);
-//		if (stat != 1) {
-//			throw new SQLException("INSERT failed");
-//		}
 		// return the id of the Entry just created
 		Integer newId = rowReader.readMaxId(TnProp.TABLE_ENTRIES);
 		return newId;
@@ -49,8 +43,6 @@ public class TnRowWriter {
 		String inst = "INSERT INTO " + TnProp.SCHEMA + "." + TnProp.TABLE_TERMS +
 				" (entryId,term,alphabet) VALUES (" +
 				realEntryId + /* "," + realId + */ ",'" + t.term + "','" + t.alphabet + "')";
-//		System.out.println("new INSERT: " + inst);
-//		Statement st = conn.createStatement();
 		try {
 			tnConn.tnExecuteStatement(inst, TnStatementType.UPDATE);
 			// return the id of the Term just created
@@ -75,12 +67,6 @@ public class TnRowWriter {
 				" (entryId,defOrder,definition,language) VALUES (" +
 				realEntryId + "," + d.defOrder + ",'" + d.definition + "','" + d.language + "')";
 		tnConn.tnExecuteStatement(inst, TnStatementType.UPDATE);
-//		System.out.println("new INSERT: " + inst);
-//		Statement st = conn.createStatement();
-//		int stat = st.executeUpdate(inst);
-//		if (stat != 1) {
-//			throw new SQLException("INSERT failed");
-//		}
 		// return the id of the Definition just created
 		Integer newId = rowReader.readMaxId(TnProp.TABLE_DEFINITIONS);
 		return newId;
@@ -94,12 +80,6 @@ public class TnRowWriter {
 				" (defId,meaningOrder,meaning) VALUES (" +
 				realDefId + "," + m.meaningOrder + ",'" + m.meaning + "')";
 		tnConn.tnExecuteStatement(inst, TnStatementType.UPDATE);
-//		System.out.println("new INSERT: " + inst);
-//		Statement st = conn.createStatement();
-//		int stat = st.executeUpdate(inst);
-//		if (stat != 1) {
-//			throw new SQLException("INSERT failed");
-//		}
 		// return the id of the Definition just created
 		Integer newId = rowReader.readMaxId(TnProp.TABLE_MEANINGS);
 		return newId;
@@ -114,12 +94,6 @@ public class TnRowWriter {
 				" (" + column + ",meaningId) VALUES (" +
 				"'" + attribute + "'," + realMeaningId + ")";
 		tnConn.tnExecuteStatement(inst, TnStatementType.UPDATE);
-//		System.out.println("new INSERT: " + inst);
-//		Statement st = conn.createStatement();
-//		int stat = st.executeUpdate(inst);
-//		if (stat != 1) {
-//			throw new SQLException("INSERT failed");
-//		}
 		// return the id of the Attribute to Meaning just created
 		Integer newId = rowReader.readMaxId(table);
 		return newId;
@@ -135,17 +109,6 @@ public class TnRowWriter {
 		String inst = "INSERT INTO " + TnProp.SCHEMA + "." + table +
 				" (" + column + ") VALUES (" + newVal + ")";
 		tnConn.tnExecuteStatement(inst, TnStatementType.UPDATE);
-//		System.out.println("new INSERT: " + inst);
-//		try {
-//			Statement st = conn.createStatement();
-//			int stat = st.executeUpdate(inst);
-//			if (stat != 1) {
-//				throw new SQLException("INSERT failed");
-//			}
-//		} catch (SQLException e) {
-//			e.printStackTrace();
-//			System.err.println("INSERT error for: " + inst);
-//		}
 	}
 
 	/**

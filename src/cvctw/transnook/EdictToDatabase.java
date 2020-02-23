@@ -245,7 +245,7 @@ public class EdictToDatabase {
 			String lang = altParts.get(0);
 			String term = "";
 			if (altParts.size() > 1) {
-				term = altParts.get(1);
+				term = altParts.get(1).replaceAll("'", "''");
 			}
 			columnList = "language,meaningId,term";
 			valuesList = "'" + lang + "'," + meaningId + ",'" + term + "'";
@@ -266,7 +266,7 @@ public class EdictToDatabase {
 			ArrayList<String> waseiParts = splitAndTrim(w, ":");
 			String term = "";
 			if (waseiParts.size() > 1) {
-				term = waseiParts.get(1);
+				term = waseiParts.get(1).replaceAll("'", "''");
 			}
 			columnList = "wasei,meaningId";
 			valuesList = "'" + term + "'," + meaningId;
@@ -294,7 +294,7 @@ public class EdictToDatabase {
 			String xref = xrefParts.get(0);
 			String xrefText = "";
 			if (xrefParts.size() > 1) {
-				xrefText = xrefParts.get(1);
+				xrefText = xrefParts.get(1).replaceAll("'", "''");
 			}
 			columnList = "xref,xrefText,meaningId";
 			valuesList = "'" + xref + "','" + xrefText + "'," + meaningId;
@@ -304,21 +304,25 @@ public class EdictToDatabase {
 		}
 	}
  
+	/**
+	 * The antonyms have already had the "ant: " prefix removed in the EdictParser method.
+	 * The multiple terms (delimited by comma) have also been added to this ArrayList.
+	 * No parsing or conversion is necessary here.
+	 * 
+	 * @param antonymArray
+	 * @param meaningId
+	 * @throws SQLException
+	 * @throws Exception
+	 */
 	private void putMeaningAntonyms(ArrayList<String> antonymArray, Integer meaningId) throws SQLException, Exception {
 		// If the meaning has none of these Attributes, no problem.  Just return happy.
 		if (antonymArray == null) {
 			return;
 		}
 		for (String ant : antonymArray) {
-			String columnList = null;
-			String valuesList = null;
-			ArrayList<String> antParts = splitAndTrim(ant, ":");
-			String antonym = "";
-			if (antParts.size() > 1) {
-				antonym = antParts.get(1);
-			}
-			columnList = "antonym,meaningId";
-			valuesList = "'" + antonym + "'," + meaningId;
+			String antonym = ant.replaceAll("'", "''");
+			String columnList = "antonym,meaningId";
+			String valuesList = "'" + antonym + "'," + meaningId;
 			rowWriter.writeRow(TnProp.TABLE_ANTONYMS2MEANINGS, columnList, valuesList, false);
 		}
 	}

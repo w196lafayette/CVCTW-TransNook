@@ -18,8 +18,6 @@ public class EdictReader {
 
 	private BufferedReader bR = null;
 	private ArrayList<String> contents = new ArrayList<String>();
-//	private ArrayList<ArrayList<Integer>> iContents = new ArrayList<ArrayList<Integer>>();
-//	private ArrayList<Integer> tContents = new ArrayList<Integer>();
 
 	@SuppressWarnings("unused")
 	private EdictReader() {
@@ -44,24 +42,6 @@ public class EdictReader {
 		bR.close();
 		// remove first line, which is comments
 		contents.remove(0);
-
-//		String newLine = "\n";
-//		BufferedReader fI = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "EUC-JP"));
-//		Integer iByte = fI.read();
-//		while (! iByte.equals(-1)) {
-//			tContents.add(iByte);
-//			if (iByte.toString().equals(newLine)) {
-//				iContents.add(new ArrayList<Integer>(tContents));
-//				tContents.clear();
-//			}
-//		}
-//		fI.close();
-//		for (ArrayList<Integer> a : iContents) {
-//			for (Integer ii : a) {
-//				System.out.print(ii + " ");
-//			}
-//			System.out.println();
-//		}
 	}
 
 	public String readLine() throws IOException {
@@ -91,11 +71,6 @@ public class EdictReader {
 					System.out.print(Byte.toUnsignedInt(jb[i]) + " ");
 				}
 				System.out.println("\n");
-//				char[] cb = l.toCharArray();
-//				for (int i = 0; i < 20 && i < cb.length; i++) {
-//					System.out.print(Character.getNumericValue(cb[i]) + " ");
-//				}
-//				System.out.println("\n-------");
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();

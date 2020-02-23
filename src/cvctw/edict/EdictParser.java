@@ -149,7 +149,7 @@ public class EdictParser {
 						ret = new ArrayList<String>();
 					}
 					if (tD.length > 1) {
-						String saveP = p.replaceAll("'", "''");
+						String saveP = p;
 						ret.add(saveP);
 					} else {
 						ret.add(lang);
@@ -201,6 +201,8 @@ public class EdictParser {
 
 	/**
 	 * Antonyms may have multiple values, delimited by a comma
+	 * This method removes the "ant: " prefix, leaving only the katakana term
+	 * 
 	 * @param allP
 	 * @param entry
 	 * @return
