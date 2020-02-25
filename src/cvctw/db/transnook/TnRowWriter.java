@@ -30,9 +30,8 @@ public class TnRowWriter {
 		String inst = "INSERT INTO " + TnProp.SCHEMA + "." + TnProp.TABLE_ENTRIES + 
 				" (entry,language,eDictId,source) VALUES ('" +
 				e.entry + "','" + e.language + "','" + e.eDictId + "','" + source + "')";
-		tnConn.tnExecuteStatement(inst, TnStatementType.UPDATE);
+		Integer newId = tnConn.tnExecuteUpdate(inst);
 		// return the id of the Entry just created
-		Integer newId = rowReader.readMaxId(TnProp.TABLE_ENTRIES);
 		return newId;
 	}
 	public Integer writeTerm(EdictTerm t) throws SQLException {
@@ -44,14 +43,9 @@ public class TnRowWriter {
 				" (entryId,term,alphabet) VALUES (" +
 				realEntryId + /* "," + realId + */ ",'" + t.term + "','" + t.alphabet + "')";
 		try {
-			tnConn.tnExecuteStatement(inst, TnStatementType.UPDATE);
+			Integer newId = tnConn.tnExecuteUpdate(inst);
 			// return the id of the Term just created
-			Integer newId = rowReader.readMaxId(TnProp.TABLE_TERMS);
 			return newId;
-//			int stat = st.executeUpdate(inst);
-//			if (stat != 1) {
-//				throw new SQLException("INSERT failed");
-//			}
 		} catch (java.sql.SQLIntegrityConstraintViolationException e) {
 			System.err.println("Term for Entry=" + realEntryId + " failed as DUPLICATE.  Term=" + t.term);
 			System.err.println(e);
@@ -66,9 +60,8 @@ public class TnRowWriter {
 		String inst = "INSERT INTO " + TnProp.SCHEMA + "." + TnProp.TABLE_DEFINITIONS +
 				" (entryId,defOrder,definition,language) VALUES (" +
 				realEntryId + "," + d.defOrder + ",'" + d.definition + "','" + d.language + "')";
-		tnConn.tnExecuteStatement(inst, TnStatementType.UPDATE);
+		Integer newId = tnConn.tnExecuteUpdate(inst);
 		// return the id of the Definition just created
-		Integer newId = rowReader.readMaxId(TnProp.TABLE_DEFINITIONS);
 		return newId;
 	}
 	public Integer writeMeaning(EdictMeaning m) throws SQLException {
@@ -77,11 +70,10 @@ public class TnRowWriter {
 			realDefId = rowReader.readMaxId(TnProp.TABLE_DEFINITIONS) + 1;
 		}
 		String inst = "INSERT INTO " + TnProp.SCHEMA + "." + TnProp.TABLE_MEANINGS +
-				" (defId,meaningOrder,meaning) VALUES (" +
-				realDefId + "," + m.meaningOrder + ",'" + m.meaning + "')";
-		tnConn.tnExecuteStatement(inst, TnStatementType.UPDATE);
-		// return the id of the Definition just created
-		Integer newId = rowReader.readMaxId(TnProp.TABLE_MEANINGS);
+				" (entryId,defId,meaningOrder,meaning) VALUES (" +
+				m.entryId + "," + realDefId + "," + m.meaningOrder + ",'" + m.meaning + "')";
+		Integer newId = tnConn.tnExecuteUpdate(inst);
+		// return the id of the Meaning just created
 		return newId;
 	}
 
@@ -93,9 +85,8 @@ public class TnRowWriter {
 		String inst = "INSERT INTO " + TnProp.SCHEMA + "." + table +
 				" (" + column + ",meaningId) VALUES (" +
 				"'" + attribute + "'," + realMeaningId + ")";
-		tnConn.tnExecuteStatement(inst, TnStatementType.UPDATE);
-		// return the id of the Attribute to Meaning just created
-		Integer newId = rowReader.readMaxId(table);
+		Integer newId = tnConn.tnExecuteUpdate(inst);
+		// return the id of the Attribute 2 Meaning just created
 		return newId;
 	}
 
@@ -108,14 +99,6 @@ public class TnRowWriter {
 		}
 		String inst = "INSERT INTO " + TnProp.SCHEMA + "." + table +
 				" (" + column + ") VALUES (" + newVal + ")";
-		tnConn.tnExecuteStatement(inst, TnStatementType.UPDATE);
+		tnConn.tnExecuteUpdate(inst);
 	}
-
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-
-	}
-
 }

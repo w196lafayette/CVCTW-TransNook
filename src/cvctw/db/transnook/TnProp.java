@@ -51,6 +51,12 @@ public class TnProp {
 	public static final String PROP_USER = "tnConnUser";
 	public static final String PROP_PWD = "tnConnPwd";
 	public static final String PROP_MAX_FAILURES = "tnMaxEntryFailures";
+
+	public static final String SQL_SELECT = "SELECT ";
+	public static final String SQL_FROM = " FROM ";
+	public static final String SQL_WHERE = " WHERE ";
+	public static final String SQL_HAVING = " HAVING ";
+	public static final String SQL_GROUP_BY = " GROUP BY ";
 	
 	private static String connProtocol = null;
 	private static String connHost = null;

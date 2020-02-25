@@ -14,16 +14,45 @@ public class EdictParser {
 	static private final String WASEI = "wasei";
 	static private final String ANTONYM = "ant";
 
+	static public EdictTerm getAnyTerm(String entry) {
+		// TO DO
+		// TO DO: detect the alphabet
+		// TO DO
+		EdictTerm ret = new EdictTerm(entry, Alphabet.katakana);
+		ArrayList<String> allP = getEnclosed(entry, "(", ")");
+		ArrayList<String> riArray = getReadingInfo(allP, entry);
+		if (riArray != null) {
+			ret.readingInfo = riArray;
+		}
+		ArrayList<String> kArray = getKanjiInfo(allP, entry);
+		if (kArray != null) {
+			ret.kanjiInfo = kArray;
+		}
+		return ret;
+	}
+
 	// In the eDict the initial terms are always kanji.
 	// Alternate terms are other alphabets
-	static public ArrayList<EdictTerm> getTerm(String entry) {
+	static public ArrayList<EdictTerm> getTerms(String entry) {
 		ArrayList<EdictTerm> ret = new ArrayList<EdictTerm>();
 		String[] tokens = entry.split(" ");
 		if (tokens.length > 1) {
 			// if ";" not found, returns an array of one entry
 			String[] terms = tokens[0].split(";");
 			for (int i = 0; i < terms.length; i++) {
-				ret.add(new EdictTerm(terms[i], Alphabet.katakana));
+//				EdictTerm t = new EdictTerm(terms[i], Alphabet.katakana);
+//				ArrayList<String> allP = getEnclosed(terms[i], "(", ")");
+//				ArrayList<String> riArray = getReadingInfo(allP, terms[i]);
+//				if (riArray != null) {
+//					t.readingInfo = riArray;
+//				}
+//				ArrayList<String> kArray = getKanjiInfo(allP, terms[i]);
+//				if (kArray != null) {
+//					t.kanjiInfo = kArray;
+//				}
+				EdictTerm t = getAnyTerm(terms[0]);
+				t.type = EdictTerm.EdictTermType.major;
+				ret.add(t);
 			}
 		}
 		return ret;
@@ -56,7 +85,9 @@ public class EdictParser {
 		String[] tok = alt.split(";");
 		for (String t : tok) {
 			// TO DO: detect the alphabet
-			ret.add(new EdictTerm(t.replace("]", ""), Alphabet.katakana));
+			EdictTerm term = getAnyTerm(t.replace("]", ""));
+			term.type = EdictTerm.EdictTermType.alternate;
+			ret.add(term);
 		}
 		return ret;
 	}
@@ -65,7 +96,7 @@ public class EdictParser {
 	 * Parts of speech may be multi-value, delimited by commas
 	 * @param allP
 	 * @param entry
-	 * @return
+	 * @return Returns a list of all parts of speech in the entry parameter
 	 */
 	static public ArrayList<String> getPartOfSpeech(ArrayList<String> allP, String entry) {
 		ArrayList<String> ret = null;
@@ -161,10 +192,17 @@ public class EdictParser {
 	}
 
 	/**
+	 * <p>
 	 * Wasei terms may have multiple values, delimited by a comma
+	 * </p>
+	 * <p>
+	 * Wasei are Japanese-language expressions based on English words or parts of word combinations, 
+	 * that do not exist in standard English or whose meanings differ from the words from which they were derived. 
+	 * Linguistics classifies them as pseudo-loanwords or pseudo-anglicisms (src: Wikipedia)
+	 * </p>
 	 * @param allP
 	 * @param entry
-	 * @return
+	 * @return Returns a list of all wasei in the entry parameter
 	 */
 	static public ArrayList<String> getWasei(ArrayList<String> allP, String entry) {
 		ArrayList<String> ret = null;
@@ -228,6 +266,36 @@ public class EdictParser {
 		return ret;
 	}
 
+	/**
+	 * 
+	 * @param allP
+	 * @param term
+	 * @return list of all ReadingInfo tokens in this Term
+	 */
+	static public ArrayList<String> getReadingInfo(ArrayList<String> allP, String term) {
+		ArrayList<String> ret = null;
+		for (String p : allP) {
+			if (ReadingInfo.isReadingInfo(p) == true) {
+				if (ret == null) {
+					ret = new ArrayList<String>();
+				}
+				ret.add(p);
+			}
+		}
+		return ret;
+	}
+	static public ArrayList<String> getKanjiInfo(ArrayList<String> allP, String term) {
+		ArrayList<String> ret = null;
+		for (String p : allP) {
+			if (KanjiInfo.isKanjiInfo(p) == true) {
+				if (ret == null) {
+					ret = new ArrayList<String>();
+				}
+				ret.add(p);
+			}
+		}
+		return ret;
+	}
 	static public ArrayList<String> getEnclosed(String entry, String open, String close) {
 		ArrayList<String> ret = new ArrayList<String>();
 		int startIdx = 0;
@@ -348,32 +416,18 @@ public class EdictParser {
 	static private EdictDefinition createDefinition(int order, String def) {
 		EdictDefinition ret = new EdictDefinition(order, def);
 		ret.defOrder = order;
-//		ArrayList<String> allP = getEnclosed(def, "(", ")");
-//		ArrayList<String> context = getContext(allP, def);
-//		ret.setContext(context);
-//		ArrayList<String> partOfSpeech = getPartOfSpeech(allP, def);
-//		ret.setPartOfSpeech(partOfSpeech);
-//		ArrayList<String> sense = getSense(allP, def);
-//		ret.setSense(sense);
-//		ArrayList<String> dialect = getDialect(allP, def);
-//		ret.setDialect(dialect);
-//		ArrayList<String> altLanguage = getAltLanguage(allP, def);
-//		ret.setAltLanguage(altLanguage);
-//		ArrayList<String> wasei = getWasei(allP, def);
-//		ret.setWasei(wasei);
-//		ArrayList<String> xref = getXref(allP, def);
-//		ret.setXref(xref);
-//		ArrayList<String> antonym = getAntonym(allP, def);
-//		ret.setAntonym(antonym);
-//
 		return ret;
 	}
 
-	static private EdictMeaning createMeaning(int order, String meaning) {
+	static public EdictMeaning createMeaning(int order, String meaning) {
 		EdictMeaning ret = new EdictMeaning(order, meaning);
 
+		// enclosed in parentheses
 		ArrayList<String> allP = getEnclosed(meaning, "(", ")");
-		ArrayList<String> context = getContext(allP, meaning);
+		// enclosed in curly brackets
+		ArrayList<String> allB = getEnclosed(meaning, "{", "}");
+		
+		ArrayList<String> context = getContext(allB, meaning);
 		ret.setContext(context);
 		ArrayList<String> partOfSpeech = getPartOfSpeech(allP, meaning);
 		ret.setPartOfSpeech(partOfSpeech);

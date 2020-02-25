@@ -4,6 +4,19 @@
 package cvctw.edict;
 
 /**
+ * <p>
+ * <p>
+ * This class 
+ * <ul>
+ * <li>
+ * declares the valid Contexts recognized by the JMdict/EDICT file
+ * </li>
+ * <li>
+ * and provides a method to validate that a candidate value is a Context
+ * </li>
+ * </ul>
+ * </p>
+ * 
  * @author minge
  *
  */
@@ -44,7 +57,7 @@ public class Context {
 	/**
 	 * 
 	 * @param inVal
-	 * @return
+	 * @return true if the inVal is a valid Context
 	 */
 	static public boolean isContext(String inVal) {
 		boolean ret = false;

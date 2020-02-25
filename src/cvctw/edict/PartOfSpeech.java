@@ -4,6 +4,18 @@
 package cvctw.edict;
 
 /**
+ * <p>
+ * This class 
+ * <ul>
+ * <li>
+ * declares the valid Parts-of-Speech recognized by the JMdict/EDICT file
+ * </li>
+ * <li>
+ * and provides a method to validate that a candidate values is a Part-of-Speech
+ * </li>
+ * </ul>
+ * </p>
+ * 
  * @author minge
  *
  */
@@ -103,6 +115,11 @@ public class PartOfSpeech {
 	"vz"
 	};
 
+	/**
+	 * 
+	 * @param inVal
+	 * @return true if the inVal is a valid Part-of-Speech
+	 */
 	static public boolean isPartOfSpeech(String inVal) {
 		boolean ret = false;
 		for (int i = 0; i < vals.length; i++) {

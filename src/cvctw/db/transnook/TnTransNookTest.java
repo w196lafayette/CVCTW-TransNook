@@ -51,7 +51,7 @@ public class TnTransNookTest {
 		ResultSet rs = st.executeQuery("select * from transnook.terms");
 		EdictTerm t = new EdictTerm();
 		while(rs.next()) {
-			t = rowReader.rsToTerm(rs);
+			t = rowReader.rs2Term(rs);
 			System.out.println(t);
 		}
 	}
@@ -61,7 +61,7 @@ public class TnTransNookTest {
 		ResultSet rs = st.executeQuery("select * from transnook.entries");
 		EdictEntry e = new EdictEntry();
 		while(rs.next()) {
-			e = rowReader.rsToEntry(rs);
+			e = rowReader.rs2Entry(rs);
 			System.out.println(e.entryOnly());
 		}
 	}
@@ -71,7 +71,7 @@ public class TnTransNookTest {
 		ResultSet rs = st.executeQuery("select * from transnook.definitions");
 		EdictDefinition d = new EdictDefinition();
 		while(rs.next()) {
-			d = rowReader.rsToDefinition(rs);
+			d = rowReader.rs2Definition(rs);
 			System.out.println(d.definitionOnly());
 		}
 	
@@ -212,7 +212,7 @@ public class TnTransNookTest {
 		try {
 			tConn = TnConnection.getInstance();
 			String query = "select * from transnook.users";
-			ResultSet rs = tConn.tnExecuteStatement(query, TnStatementType.QUERY);
+			ResultSet rs = tConn.tnExecuteQuery(query);
 			while(rs.next()) {
 				String fName = rs.getString("firstName");
 				System.out.println("firstName=" + fName);

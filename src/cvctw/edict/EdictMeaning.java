@@ -3,6 +3,7 @@ package cvctw.edict;
 import java.util.ArrayList;
 
 public class EdictMeaning {
+	public Integer entryId;
 	public Integer defId;
 	public Integer id;
 	public Integer meaningOrder;
@@ -22,6 +23,7 @@ public class EdictMeaning {
 	public EdictMeaning(Integer order, String def) {
 		this.meaningOrder = order;
 		this.meaning = def;
+		this.entryId = null;
 		this.id = null;
 		this.contexts = null;
 		this.partsOfSpeech = null;
@@ -35,6 +37,10 @@ public class EdictMeaning {
 
 	public void setId(Integer id) {
 		this.id = id;
+	}
+
+	public void setEntryId(Integer entryId) {
+		this.entryId = entryId;
 	}
 
 	public void setContext(ArrayList<String> context) {
@@ -70,7 +76,7 @@ public class EdictMeaning {
 	}
 
 	public String meaningOnly() {
-		String ret = "defId=" + defId + ", id=" + id + ", meaningOrder=" + meaningOrder + 
+		String ret = "entryId" + entryId + ", defId=" + defId + ", id=" + id + ", meaningOrder=" + meaningOrder + 
 				", meaning=" + meaning;
 		return ret;
 	}

@@ -4,6 +4,18 @@
 package cvctw.edict;
 
 /**
+ * <p>
+ * This class 
+ * <ul>
+ * <li>
+ * declares the valid Dialects recognized by the JMdict/EDICT file
+ * </li>
+ * <li>
+ * and provides a method to validate that a candidate values is a Dialect
+ * </li>
+ * </ul>
+ * </p>
+ * 
  * @author minge
  *
  */
@@ -26,7 +38,7 @@ public class Dialect {
 	/**
 	 * 
 	 * @param inVal
-	 * @return
+	 * @return true if the inVal is a valid Dialect
 	 */
 	static public boolean isDialect(String inVal) {
 		boolean ret = false;

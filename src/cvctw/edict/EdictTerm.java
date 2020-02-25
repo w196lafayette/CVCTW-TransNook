@@ -1,10 +1,19 @@
 package cvctw.edict;
 
+import java.util.ArrayList;
+
 public class EdictTerm {
+	public enum EdictTermType {
+		major,
+		alternate
+	}
 	public Integer entryId;
 	public Integer id;
 	public String term;
 	public Alphabet alphabet;
+	public EdictTermType type;
+	public ArrayList<String> readingInfo;
+	public ArrayList<String> kanjiInfo;
 	
 	public EdictTerm() {
 		entryId = null;

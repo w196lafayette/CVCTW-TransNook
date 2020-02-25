@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import cvctw.edict.Alphabet;
 import cvctw.edict.EdictDefinition;
 import cvctw.edict.EdictEntry;
+import cvctw.edict.EdictMeaning;
+import cvctw.edict.EdictParser;
 import cvctw.edict.EdictTerm;
 import cvctw.edict.Source;
 
@@ -21,27 +23,20 @@ import cvctw.edict.Source;
  */
 public class TnRowReader {
 
-	public static final String SQL_SELECT_STAR = "select * from transnook.";
-	public static final String SQL_SELECT_MAX_ID = "select max(id) from transnook.";
+	public static final String SQL_SELECT_STAR = "select * from " + TnProp.SCHEMA + ".";
+	public static final String SQL_SELECT_MAX_ID = "select max(id) from " + TnProp.SCHEMA + ".";
 	public static final String SQL_WHERE_ENTRY_ID = " where entryId=";
+	public static final String SQL_WHERE_DEF_ID = " where defId=";
+	public static final String SQL_WHERE_ID = " where id=";
 	
 	private TnConnection tnConn = null;
 
-//	@SuppressWarnings("unused")
-//	private TnRowReader() {
-//		; // disable this ctor
-//	}
-
 	public TnRowReader() throws SQLException, FileNotFoundException, IOException {
-//		if (conn == null) {
-//			throw new SQLException("Connection argument may not be NULL");
-//		}
 		this.tnConn = TnConnection.getInstance();
 	}
 
 	public boolean isRowPresent(String table, String column, String value, boolean isString) throws SQLException {
 		boolean ret = false;
-//		Statement st = conn.createStatement();
 		String valQ = null;
 		if (isString == true) {
 			valQ = "'" + value + "'";
@@ -49,8 +44,7 @@ public class TnRowReader {
 			valQ = value;
 		}
 		String query = "select " + column + " from " + table + " where " + column + "=" + valQ;
-		ResultSet rs = tnConn.tnExecuteStatement(query, TnStatementType.QUERY);
-		// st.executeQuery(query);
+		ResultSet rs = tnConn.tnExecuteQuery(query);
 		if (isString == true) {
 			String qVal = null;
 			while(rs.next()) {
@@ -74,8 +68,7 @@ public class TnRowReader {
 	public Integer readMaxId(String table) throws SQLException {
 		Integer ret = 0;
 		String query = SQL_SELECT_MAX_ID + table;
-//		Statement st = conn.createStatement();
-		ResultSet rs = tnConn.tnExecuteStatement(query, TnStatementType.QUERY);
+		ResultSet rs = tnConn.tnExecuteQuery(query);
 		// st.executeQuery(SQL_SELECT_MAX_ID + table);
 		while(rs.next()) {
 			ret = rs.getInt(1);
@@ -86,8 +79,7 @@ public class TnRowReader {
 	public Integer readMaxIdForEntry(String table, Integer entryId) throws SQLException {
 		Integer ret = 0;
 		String query = SQL_SELECT_MAX_ID + table + SQL_WHERE_ENTRY_ID + entryId;
-//		Statement st = conn.createStatement();
-		ResultSet rs = tnConn.tnExecuteStatement(query, TnStatementType.QUERY);
+		ResultSet rs = tnConn.tnExecuteQuery(query);
 		// st.executeQuery(SQL_SELECT_MAX_ID + table + SQL_WHERE_ENTRY_ID + entryId);
 		while(rs.next()) {
 			ret = rs.getInt(1);
@@ -98,19 +90,28 @@ public class TnRowReader {
 	public ArrayList<EdictEntry> readEntries() throws SQLException {
 		ArrayList<EdictEntry> ret = new ArrayList<EdictEntry>();
 		String query = SQL_SELECT_STAR + TnProp.TABLE_ENTRIES;
-//		Statement st = conn.createStatement();
-		ResultSet rs = tnConn.tnExecuteStatement(query, TnStatementType.QUERY);
+		ResultSet rs = tnConn.tnExecuteQuery(query);
 		// st.executeQuery(SQL_SELECT_STAR + TnProp.TABLE_ENTRIES);
 		EdictEntry e = null;
 		while(rs.next()) {
-			e = rsToEntry(rs);
+			e = rs2Entry(rs);
 			ret.add(e);
 		}
 		System.out.println("entry count=" + ret.size());
 		tnConn.tnCloseResultSet();
 		return ret;
 	}
-	public EdictEntry rsToEntry(ResultSet rs) throws SQLException {
+	public EdictEntry readEntry(Integer entryId) throws SQLException {
+		EdictEntry ret = null;
+		String query = SQL_SELECT_STAR + TnProp.TABLE_ENTRIES + SQL_WHERE_ID + entryId;
+		ResultSet rs = tnConn.tnExecuteQuery(query);
+		while(rs.next()) {
+			ret = rs2Entry(rs);
+		}
+		tnConn.tnCloseResultSet();
+		return ret;
+	}
+	public EdictEntry rs2Entry(ResultSet rs) throws SQLException {
 		EdictEntry e = new EdictEntry();
 		e.id = rs.getInt("id");
 		e.entry = rs.getString("entry");
@@ -122,18 +123,30 @@ public class TnRowReader {
 	public ArrayList<EdictTerm> readTerms() throws SQLException {
 		ArrayList<EdictTerm> ret = new ArrayList<EdictTerm>();
 		String query = SQL_SELECT_STAR + TnProp.TABLE_TERMS;
-//		Statement st = conn.createStatement();
-		ResultSet rs = tnConn.tnExecuteStatement(query, TnStatementType.QUERY);
+		ResultSet rs = tnConn.tnExecuteQuery(query);
 		// st.executeQuery(SQL_SELECT_STAR + TnProp.TABLE_TERMS);
 		EdictTerm t = null;
 		while(rs.next()) {
-			t = rsToTerm(rs);
+			t = rs2Term(rs);
 			ret.add(t);
 		}
 		tnConn.tnCloseResultSet();
 		return ret;
 	}
-	public EdictTerm rsToTerm(ResultSet rs) throws SQLException {
+	public ArrayList<EdictTerm> readTerms(Integer entryId) throws SQLException {
+		ArrayList<EdictTerm> ret = new ArrayList<EdictTerm>();
+		String query = SQL_SELECT_STAR + TnProp.TABLE_TERMS + SQL_WHERE_ENTRY_ID + entryId;
+		ResultSet rs = tnConn.tnExecuteQuery(query);
+		// st.executeQuery(SQL_SELECT_STAR + TnProp.TABLE_TERMS);
+		EdictTerm t = null;
+		while(rs.next()) {
+			t = rs2Term(rs);
+			ret.add(t);
+		}
+		tnConn.tnCloseResultSet();
+		return ret;
+	}
+	public EdictTerm rs2Term(ResultSet rs) throws SQLException {
 		EdictTerm t = new EdictTerm();
 		t.entryId = rs.getInt("entryId");
 		t.id = rs.getInt("id");
@@ -144,20 +157,29 @@ public class TnRowReader {
 
 	public ArrayList<EdictDefinition> readDefinitions() throws SQLException {
 		ArrayList<EdictDefinition> ret = new ArrayList<EdictDefinition>();
-		String query = "SQL_SELECT_STAR + TnProp.TABLE_DEFINITIONS";
-//		Statement st = conn.createStatement();
-		ResultSet rs = tnConn.tnExecuteStatement(query, TnStatementType.QUERY);
-		// st.executeQuery(SQL_SELECT_STAR + TnProp.TABLE_DEFINITIONS);
+		String query = SQL_SELECT_STAR + TnProp.TABLE_DEFINITIONS;
+		ResultSet rs = tnConn.tnExecuteQuery(query);
 		EdictDefinition d = null;
 		while(rs.next()) {
-			d = rsToDefinition(rs);
+			d = rs2Definition(rs);
 			ret.add(d);
 		}
 		tnConn.tnCloseResultSet();
 		return ret;
 	}
-
-	public EdictDefinition rsToDefinition(ResultSet rs) throws SQLException {
+	public ArrayList<EdictDefinition> readDefinitions(Integer entryId) throws SQLException {
+		ArrayList<EdictDefinition> ret = new ArrayList<EdictDefinition>();
+		String query = SQL_SELECT_STAR + TnProp.TABLE_DEFINITIONS + SQL_WHERE_ENTRY_ID + entryId;
+		ResultSet rs = tnConn.tnExecuteQuery(query);
+		EdictDefinition d = null;
+		while(rs.next()) {
+			d = rs2Definition(rs);
+			ret.add(d);
+		}
+		tnConn.tnCloseResultSet();
+		return ret;
+	}
+	public EdictDefinition rs2Definition(ResultSet rs) throws SQLException {
 		EdictDefinition d = new EdictDefinition();
 		d.entryId = rs.getInt("entryId");
 		d.id = rs.getInt("id");
@@ -167,4 +189,68 @@ public class TnRowReader {
 		return d;
 	}
 
+	public ArrayList<EdictMeaning> readMeanings() throws SQLException {
+		ArrayList<EdictMeaning> ret = new ArrayList<EdictMeaning>();
+		String query = SQL_SELECT_STAR + TnProp.TABLE_DEFINITIONS;
+		ResultSet rs = tnConn.tnExecuteQuery(query);
+		EdictMeaning d = null;
+		while(rs.next()) {
+			d = rs2Meaning(rs);
+			ret.add(d);
+		}
+		tnConn.tnCloseResultSet();
+		return ret;
+	}
+	public ArrayList<EdictMeaning> readMeanings(Integer defId) throws SQLException {
+		ArrayList<EdictMeaning> ret = new ArrayList<EdictMeaning>();
+		String query = SQL_SELECT_STAR + TnProp.TABLE_MEANINGS + SQL_WHERE_DEF_ID + defId;
+		ResultSet rs = tnConn.tnExecuteQuery(query);
+		EdictMeaning d = null;
+		while(rs.next()) {
+			d = rs2Meaning(rs);
+			ret.add(d);
+		}
+		tnConn.tnCloseResultSet();
+		return ret;
+	}
+	public EdictMeaning rs2Meaning(ResultSet rs) throws SQLException {
+		EdictMeaning m = new EdictMeaning();
+		m.entryId = rs.getInt("entryId");
+		m.defId = rs.getInt("defId");
+		m.id = rs.getInt("id");
+		m.meaningOrder = rs.getInt("meaningOrder");
+		m.meaning = rs.getString("meaning");
+		// Now PARSE and POPULATE all of the arrays of "attributes"
+		EdictMeaning mean = EdictParser.createMeaning(m.meaningOrder, m.meaning);
+		return mean;
+	}
+
+	public EdictEntry readEntryFull(Integer entryId) throws SQLException {
+		EdictEntry ret = readEntry(entryId);
+		if (ret == null) {
+			System.err.println("Entry for entryId=" + entryId + " not found");
+			return ret;
+		}
+		ArrayList<EdictTerm> termArray = readTerms(entryId);
+		if (termArray == null) {
+			System.err.println("Terms for entryId=" + entryId + " not found");
+			return null;
+		}
+		ret.terms = termArray;
+		ArrayList<EdictDefinition> defArray = readDefinitions(entryId);
+		if (defArray == null) {
+			System.err.println("Definitions for entryId=" + entryId + " not found");
+			return null;
+		}
+		for (EdictDefinition d : defArray) {
+			ArrayList<EdictMeaning> meaningArray = readMeanings(d.id);
+			if (meaningArray == null) {
+				System.err.println("Meanings for defId=" + d.id + " not found");
+				return null;
+			}
+			d.meanings = meaningArray;
+		}
+		ret.definitions = defArray;
+		return ret;
+	}
 }

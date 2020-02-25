@@ -65,7 +65,7 @@ public class TnConnection {
 		theOnlyConn = (Connection) DriverManager.getConnection("jdbc:mysql://localhost:3306?" +
 				"user=root&password=PA65*18@du");
 		System.out.println("connected by DriverManager");
-		tnExecuteStatement(SET_AUTOCOMMIT_0, TnStatementType.UPDATE);
+		tnExecuteUpdate(SET_AUTOCOMMIT_0);
 		return theOnlyConn;
 	}
 
@@ -80,7 +80,7 @@ public class TnConnection {
 		ds.setPassword(prop.getConnPwd()); //"PA65*18@du");
 		theOnlyConn = ds.getConnection();
 		System.out.println("connected by DataSource");
-		tnExecuteStatement(SET_AUTOCOMMIT_0, TnStatementType.UPDATE);
+		tnExecuteUpdate(SET_AUTOCOMMIT_0);
 		return theOnlyConn;
 	}
 
@@ -95,19 +95,46 @@ public class TnConnection {
 		}
 	}
 
-	public ResultSet tnExecuteStatement(String stmnt, TnStatementType stmntType) throws SQLException {
+	/**
+	 * Executes the QUERY (select) statement
+	 * 
+	 * @param stmnt
+	 * @return ResultSet of the QUERY
+	 * @throws SQLException
+	 */
+	public ResultSet tnExecuteQuery(String stmnt) throws SQLException {
 		try {
 			Statement st = theOnlyConn.createStatement();
-			if (stmntType == TnStatementType.QUERY) {
-				System.out.println("executing query: " + stmnt);
-				theOnlyResultSet = st.executeQuery(stmnt);
-			} else if (stmntType == TnStatementType.UPDATE) {
-				System.out.println("executing update: " + stmnt);
-				// Not necessary to check the int returned
-				// Can't do anything with it in this multi-purpose methor.
-				st.executeUpdate(stmnt);
-			}
+			System.out.println("executing query: " + stmnt);
+			theOnlyResultSet = st.executeQuery(stmnt);
 			return theOnlyResultSet;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw e;
+		}
+	}
+
+	/**
+	 * Executes the UPDATE-type stmnt argument
+	 * 
+	 * @param stmnt
+	 * @return the auto-generated key, if any found, otherwise null
+	 * @throws SQLException
+	 */
+	public Integer tnExecuteUpdate(String stmnt) throws SQLException {
+		try {
+			Statement st = theOnlyConn.createStatement();
+			System.out.println("executing update: " + stmnt);
+			// Not necessary to check the int returned
+			// Can't do anything with it in this multi-purpose methor.
+			st.executeUpdate(stmnt, Statement.RETURN_GENERATED_KEYS);
+			// Get the generated key, if any
+			Integer key = null;
+			ResultSet rs = st.getGeneratedKeys();
+			if (rs.next()) {
+				key = rs.getInt(1);
+			}
+			return key;
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw e;

@@ -12,7 +12,6 @@ import cvctw.db.transnook.TnConnection;
 import cvctw.db.transnook.TnProp;
 import cvctw.db.transnook.TnRowReader;
 import cvctw.db.transnook.TnRowWriter;
-import cvctw.db.transnook.TnStatementType;
 import cvctw.db.transnook.TnStaticTable;
 import cvctw.edict.Dictionary;
 import cvctw.edict.EdictDefinition;
@@ -66,18 +65,18 @@ public class EdictToDatabase {
 	public void dictToDb() throws SQLException, Exception {
 		for (EdictEntry dE : dictEntries) {
 			try {
-				tnConnection.tnExecuteStatement(TnConnection.START_TRANSACTION, TnStatementType.UPDATE);
+				tnConnection.tnExecuteUpdate(TnConnection.START_TRANSACTION);
 				putEntry(dE);
 			} catch (Exception e) {
 				e.printStackTrace();
-				tnConnection.tnExecuteStatement(TnConnection.ROLLBACK, TnStatementType.UPDATE);
+				tnConnection.tnExecuteUpdate(TnConnection.ROLLBACK);
 				entryFailures++;
 				if (entryFailures > maxEntryFailures) {
 					System.err.println(entryFailures + " exceeds the max " + maxEntryFailures + ".  Exiting");
 					throw e;
 				}
 			}
-			tnConnection.tnExecuteStatement(TnConnection.COMMIT, TnStatementType.UPDATE);
+			tnConnection.tnExecuteUpdate(TnConnection.COMMIT);
 		}
 	}
 
@@ -107,7 +106,7 @@ public class EdictToDatabase {
 			Integer defId = putDefinition(d, entryId);
 			// Insert child Meaning records
 			for (EdictMeaning m : d.meanings) {
-				Integer meaningId = putMeaning(m, defId);
+				Integer meaningId = putMeaning(m, entryId, defId);
 				putMeaningAttributes(m.contexts, meaningId, 
 						TnProp.TABLE_CONTEXTS, TnProp.COLUMN_CONTEXTS, TnProp.TABLE_CONTEXTS2MEANINGS);
 				putMeaningAttributes(m.partsOfSpeech, meaningId, 
@@ -172,11 +171,13 @@ public class EdictToDatabase {
 	 * @throws SQLException
 	 * @throws Exception
 	 */
-	private Integer putMeaning(EdictMeaning m, Integer defId) throws SQLException, Exception {
+	private Integer putMeaning(EdictMeaning m, Integer entryId, Integer defId) throws SQLException, Exception {
 		// Escape any apostrophes in the meaning
 		String newMeaning = m.meaning.replaceAll("'", "''");
 		m.meaning = newMeaning;
-		// Get the parent Entry's id
+		// Get the grand-parent Entry's id
+		m.entryId = entryId;
+		// Get the parent Definition's id
 		m.defId = defId;
 		// Insert Meaning and save its new id
 		Integer meaningId = rowWriter.writeMeaning(m);
@@ -328,6 +329,11 @@ public class EdictToDatabase {
 	}
  
 	/**
+	 * Principal gateway into the features of the TransNook project.
+	 * Requires two parameters:
+	 * 1) path of the eDict file to read
+	 * 2) path of the Properties file to read
+	 * 
 	 * @param args
 	 * @throws IOException 
 	 * @throws SQLException 

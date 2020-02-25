@@ -37,7 +37,7 @@ public class EdictEntry {
 	public EdictEntry(String entry) {
 		init(this);
 		this.entry = entry;
-		ArrayList<EdictTerm> termL = EdictParser.getTerm(entry);
+		ArrayList<EdictTerm> termL = EdictParser.getTerms(entry);
 		for (EdictTerm t : termL) {
 			this.terms.add(t);
 		}
@@ -65,7 +65,7 @@ public class EdictEntry {
 		return ret;
 	}
 
-	public String toString() {
+	public String fullToString() {
 		String ret = "entry=" + entry + "\n";
 		for (EdictTerm t : terms) {
 			ret = ret + "term=" + t.term + ",";

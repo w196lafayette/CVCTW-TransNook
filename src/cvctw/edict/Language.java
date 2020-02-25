@@ -4,6 +4,18 @@
 package cvctw.edict;
 
 /**
+ * <p>
+ * This class 
+ * <ul>
+ * <li>
+ * declares the valid Languages recognized by the JMdict/EDICT file
+ * </li>
+ * <li>
+ * and provides a method to validate that a candidate values is a Language
+ * </li>
+ * </ul>
+ * </p>
+ * 
  * @author minge
  *
  */
@@ -77,7 +89,12 @@ public class Language {
 	"vie",
 	"yid"
 	};
-	
+
+	/**
+	 * 
+	 * @param inVal
+	 * @return true if the inVal is a valid Language
+	 */
 	static public boolean isLanguage(String inVal) {
 		boolean ret = false;
 		for (int i = 0; i < vals.length; i++) {
