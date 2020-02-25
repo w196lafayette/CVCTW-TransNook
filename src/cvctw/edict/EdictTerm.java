@@ -20,6 +20,7 @@ public class EdictTerm {
 		id = null;
 		term = null;
 		alphabet = null;
+		type = null;
 	}
 
 	public EdictTerm(String term, Alphabet alphabet) {
@@ -39,7 +40,7 @@ public class EdictTerm {
 
 	public String toString() {
 		String ret = "entryId=" + entryId + ", id=" + id + 
-				", term=" + term + ", alphabet=" + alphabet;
+				", term=" + term + ", alphabet=" + alphabet + ", type=" + type;
 		return ret;
 	}
 

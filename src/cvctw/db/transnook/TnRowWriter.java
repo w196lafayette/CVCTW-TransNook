@@ -39,9 +39,11 @@ public class TnRowWriter {
 		if (t.entryId == null) {
 			realEntryId = rowReader.readMaxId(TnProp.TABLE_ENTRIES) + 1;
 		}
+		// Grab only the first character of term type
+		String termType = t.type.name().substring(0,1);
 		String inst = "INSERT INTO " + TnProp.SCHEMA + "." + TnProp.TABLE_TERMS +
-				" (entryId,term,alphabet) VALUES (" +
-				realEntryId + /* "," + realId + */ ",'" + t.term + "','" + t.alphabet + "')";
+				" (entryId,term,alphabet,termType) VALUES (" +
+				realEntryId + /* "," + realId + */ ",'" + t.term + "','" + t.alphabet + "','" + termType + "')";
 		try {
 			Integer newId = tnConn.tnExecuteUpdate(inst);
 			// return the id of the Term just created
@@ -51,6 +53,18 @@ public class TnRowWriter {
 			System.err.println(e);
 			return null;
 		}
+	}
+	public Integer writeAttrToTerm(String table, String column, String attribute, Integer termId) throws SQLException {
+		Integer realTermId = termId;
+		if (termId == null) {
+			realTermId = rowReader.readMaxId(TnProp.TABLE_TERMS) + 1;
+		}
+		String inst = "INSERT INTO " + TnProp.SCHEMA + "." + table +
+				" (" + column + ",termId) VALUES (" +
+				"'" + attribute + "'," + realTermId + ")";
+		Integer newId = tnConn.tnExecuteUpdate(inst);
+		// return the id of the Attribute 2 Term just created
+		return newId;
 	}
 	public Integer writeDefinition(EdictDefinition d) throws SQLException {
 		Integer realEntryId = d.entryId;
@@ -77,7 +91,8 @@ public class TnRowWriter {
 		return newId;
 	}
 
-	public Integer writeAttrToMeaning(String table, String column, String attribute, Integer meaningId) throws SQLException {
+	public Integer writeAttrToMeaning(String table, String column, String attribute, Integer meaningId) 
+			throws SQLException {
 		Integer realMeaningId = meaningId;
 		if (meaningId == null) {
 			realMeaningId = rowReader.readMaxId(TnProp.TABLE_MEANINGS) + 1;
@@ -90,7 +105,8 @@ public class TnRowWriter {
 		return newId;
 	}
 
-	public void writeRow(String table, String column, String inVal, boolean isString) throws SQLException  {
+	public Integer writeRow(String table, String column, String inVal, boolean isString) throws SQLException  {
+		Integer rowId = null;
 		String newVal = null;
 		if (isString == true) {
 			newVal = "'" + inVal + "'";
@@ -99,6 +115,7 @@ public class TnRowWriter {
 		}
 		String inst = "INSERT INTO " + TnProp.SCHEMA + "." + table +
 				" (" + column + ") VALUES (" + newVal + ")";
-		tnConn.tnExecuteUpdate(inst);
+		rowId = tnConn.tnExecuteUpdate(inst);
+		return rowId;
 	}
 }

@@ -5,6 +5,7 @@ package cvctw.transnook;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -99,7 +100,11 @@ public class EdictToDatabase {
 		Integer entryId = rowWriter.writeEntry(dE, source);
 		// Insert child Term records
 		for (EdictTerm t : dE.terms) {
-			putTerm(t, entryId);
+			Integer termId = putTerm(t, entryId);
+			putTermAttributes(t.readingInfo, termId, 
+					TnProp.TABLE_READING_INFO, TnProp.COLUMN_READING_INFO, TnProp.TABLE_READING_INFO2TERMS);
+			putTermAttributes(t.kanjiInfo, termId, 
+					TnProp.TABLE_KANJI_INFO, TnProp.COLUMN_KANJI_INFO, TnProp.TABLE_KANJI_INFO2TERMS);
 		}
 		// Insert child Definition records
 		for (EdictDefinition d : dE.definitions) {
@@ -130,7 +135,7 @@ public class EdictToDatabase {
 	 * @throws SQLException
 	 * @throws Exception
 	 */
-	private void putTerm(EdictTerm t, Integer entryId) throws SQLException, Exception {
+	private Integer putTerm(EdictTerm t, Integer entryId) throws SQLException, Exception {
 		// Escape any apostrophes in the term (unlikely, but possible
 		String newTerm = t.term.replaceAll("'", "''");
 		t.term = newTerm;
@@ -139,7 +144,23 @@ public class EdictToDatabase {
 		// Get the parent Entry's id
 		t.entryId = entryId;
 		// Insert Term
-		rowWriter.writeTerm(t);
+		Integer id = rowWriter.writeTerm(t);
+		return id;
+	}
+	private void putTermAttributes(ArrayList<String> attributesArray, Integer termId, 
+			String table, String column, String att2termTable) 
+					throws SQLException, Exception {
+		// If the meaning has none of these Attributes, no problem.  Just return happy.
+		if (attributesArray == null) {
+			return;
+		}
+		// Insert the Definition's child Attribute records
+		for (String attribute : attributesArray) {
+			// If the Attribute is missing in its static table, insert it
+			staticTable.insertIfMissing(table, attribute);
+			// Link this Attribute to this Definition
+			rowWriter.writeAttrToTerm(att2termTable, column, attribute, termId);
+		}
 	}
 
 	/**

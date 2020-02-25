@@ -35,6 +35,24 @@ public class TnRowReader {
 		this.tnConn = TnConnection.getInstance();
 	}
 
+	public boolean isRowPresent(String table, String column1, String value1, String column2, String value2) 
+			throws SQLException  {
+		boolean ret = false;
+		String query = "select " + column1 + "," + column2 + " from " + table + " where " + 
+				column1 + "='" + value1 + "' and " + column2 + "='" + value2 + "'";
+		ResultSet rs = tnConn.tnExecuteQuery(query);
+		String qVal1 = null;
+		String qval2 = null;
+		while(rs.next()) {
+			qVal1 = rs.getString(1);
+			qval2 = rs.getString(2);
+		}
+		if (value1.equals(qVal1) && value2.equals(qval2)) {
+			ret = true;
+		}
+
+		return ret;
+	}
 	public boolean isRowPresent(String table, String column, String value, boolean isString) throws SQLException {
 		boolean ret = false;
 		String valQ = null;

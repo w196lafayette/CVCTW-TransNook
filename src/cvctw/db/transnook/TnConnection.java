@@ -70,6 +70,9 @@ public class TnConnection {
 	}
 
 	public Connection tnConnDataSource() throws SQLException {
+		if (theOnlyConn != null) {
+			return theOnlyConn;
+		}
 		MysqlDataSource ds = new MysqlDataSource();
 
 		// Set dataSource Properties

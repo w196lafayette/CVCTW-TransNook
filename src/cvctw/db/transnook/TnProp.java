@@ -19,6 +19,12 @@ public class TnProp {
 
 	public static final String TABLE_ENTRIES = "entries";
 	public static final String TABLE_TERMS = "terms";
+	public static final String TABLE_READING_INFO = "readingInfo";
+	public static final String COLUMN_READING_INFO = "info";
+	public static final String TABLE_READING_INFO2TERMS = "readingInfo2terms";
+	public static final String TABLE_KANJI_INFO = "kanjiInfo";
+	public static final String COLUMN_KANJI_INFO = "info";
+	public static final String TABLE_KANJI_INFO2TERMS = "kanjiInfo2terms";
 	public static final String TABLE_DEFINITIONS = "definitions";
 	public static final String TABLE_MEANINGS = "meanings";
 	public static final String TABLE_LANGUAGES = "languages";
