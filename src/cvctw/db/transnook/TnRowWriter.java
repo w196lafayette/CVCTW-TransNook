@@ -105,16 +105,16 @@ public class TnRowWriter {
 		return newId;
 	}
 
-	public Integer writeRow(String table, String column, String inVal, boolean isString) throws SQLException  {
+	public Integer writeRow(String table, String columnList, String valueList, boolean isString) throws SQLException  {
 		Integer rowId = null;
 		String newVal = null;
 		if (isString == true) {
-			newVal = "'" + inVal + "'";
+			newVal = "'" + valueList + "'";
 		} else {
-			newVal = inVal;
+			newVal = valueList;
 		}
 		String inst = "INSERT INTO " + TnProp.SCHEMA + "." + table +
-				" (" + column + ") VALUES (" + newVal + ")";
+				" (" + columnList + ") VALUES (" + newVal + ")";
 		rowId = tnConn.tnExecuteUpdate(inst);
 		return rowId;
 	}

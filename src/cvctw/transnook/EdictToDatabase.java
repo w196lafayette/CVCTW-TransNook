@@ -5,7 +5,6 @@ package cvctw.transnook;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -14,12 +13,23 @@ import cvctw.db.transnook.TnProp;
 import cvctw.db.transnook.TnRowReader;
 import cvctw.db.transnook.TnRowWriter;
 import cvctw.db.transnook.TnStaticTable;
+import cvctw.edict.Antonym;
+import cvctw.edict.Context;
+import cvctw.edict.Dialect;
 import cvctw.edict.Dictionary;
 import cvctw.edict.EdictDefinition;
 import cvctw.edict.EdictEntry;
+import cvctw.edict.EdictEnum;
 import cvctw.edict.EdictMeaning;
 import cvctw.edict.EdictReader;
 import cvctw.edict.EdictTerm;
+import cvctw.edict.KanjiInfo;
+import cvctw.edict.Language;
+import cvctw.edict.PartOfSpeech;
+import cvctw.edict.ReadingInfo;
+import cvctw.edict.Sense;
+import cvctw.edict.Wasei;
+import cvctw.edict.Xref;
 
 /**
  * @author minge
@@ -35,6 +45,16 @@ public class EdictToDatabase {
 	private TnConnection tnConnection = null;
 	private Integer entryFailures = 0;
 	private Integer maxEntryFailures = 0;
+	private static Context eContext = new Context();
+	private static ReadingInfo eReadingInfo = new ReadingInfo();
+	private static KanjiInfo eKanjiInfo = new KanjiInfo();
+	private static Dialect eDialect = new Dialect();
+	private static Sense eSense = new Sense();
+	private static PartOfSpeech ePartOfSpeech = new PartOfSpeech();
+	private static Language eLanguage = new Language();
+	private static Wasei eWasei = new Wasei();
+	private static Xref eXref = new Xref();
+	private static Antonym eAntonym = new Antonym();
 
 
 	EdictToDatabase(String eDictPath, String propPath) throws IOException, FileNotFoundException, SQLException {
@@ -101,10 +121,8 @@ public class EdictToDatabase {
 		// Insert child Term records
 		for (EdictTerm t : dE.terms) {
 			Integer termId = putTerm(t, entryId);
-			putTermAttributes(t.readingInfo, termId, 
-					TnProp.TABLE_READING_INFO, TnProp.COLUMN_READING_INFO, TnProp.TABLE_READING_INFO2TERMS);
-			putTermAttributes(t.kanjiInfo, termId, 
-					TnProp.TABLE_KANJI_INFO, TnProp.COLUMN_KANJI_INFO, TnProp.TABLE_KANJI_INFO2TERMS);
+			putAttributes(t.readingInfo, eReadingInfo, termId);
+			putAttributes(t.kanjiInfo, eKanjiInfo, termId);
 		}
 		// Insert child Definition records
 		for (EdictDefinition d : dE.definitions) {
@@ -112,14 +130,11 @@ public class EdictToDatabase {
 			// Insert child Meaning records
 			for (EdictMeaning m : d.meanings) {
 				Integer meaningId = putMeaning(m, entryId, defId);
-				putMeaningAttributes(m.contexts, meaningId, 
-						TnProp.TABLE_CONTEXTS, TnProp.COLUMN_CONTEXTS, TnProp.TABLE_CONTEXTS2MEANINGS);
-				putMeaningAttributes(m.partsOfSpeech, meaningId, 
-						TnProp.TABLE_PARTSOFSPEECH, TnProp.COLUMN_PARTSOFSPEECH, TnProp.TABLE_PARTSOFSPEECH2MEANINGS);
-				putMeaningAttributes(m.senses, meaningId, 
-						TnProp.TABLE_SENSES, TnProp.COLUMN_SENSES, TnProp.TABLE_SENSES2MEANINGS);
-				putMeaningAttributes(m.dialects, meaningId, 
-						TnProp.TABLE_DIALECTS, TnProp.COLUMN_DIALECTS, TnProp.TABLE_DIALECTS2MEANINGS);
+
+				putAttributes(m.contexts, eContext, meaningId);
+				putAttributes(m.partsOfSpeech, ePartOfSpeech, meaningId);
+				putAttributes(m.senses, eSense, meaningId);
+				putAttributes(m.dialects, eDialect, meaningId);
 				putMeaningAltLanguages(m.altLanguages, meaningId);
 				putMeaningWaseis(m.waseis, meaningId);
 				putMeaningXrefs(m.xrefs, meaningId);
@@ -147,27 +162,12 @@ public class EdictToDatabase {
 		Integer id = rowWriter.writeTerm(t);
 		return id;
 	}
-	private void putTermAttributes(ArrayList<String> attributesArray, Integer termId, 
-			String table, String column, String att2termTable) 
-					throws SQLException, Exception {
-		// If the meaning has none of these Attributes, no problem.  Just return happy.
-		if (attributesArray == null) {
-			return;
-		}
-		// Insert the Definition's child Attribute records
-		for (String attribute : attributesArray) {
-			// If the Attribute is missing in its static table, insert it
-			staticTable.insertIfMissing(table, attribute);
-			// Link this Attribute to this Definition
-			rowWriter.writeAttrToTerm(att2termTable, column, attribute, termId);
-		}
-	}
 
 	/**
 	 * 
 	 * @param d
 	 * @param entryId
-	 * @return
+	 * @return the auto-generated key of the new record
 	 * @throws SQLException
 	 * @throws Exception
 	 */
@@ -188,7 +188,7 @@ public class EdictToDatabase {
 	 * 
 	 * @param m
 	 * @param defId
-	 * @return
+	 * @return the auto-generated key of the new record
 	 * @throws SQLException
 	 * @throws Exception
 	 */
@@ -205,47 +205,32 @@ public class EdictToDatabase {
 		return meaningId;
 	}
 
-	/**
-	 * 
-	 * @param attributesArray
-	 * @param meaningId
-	 * @param table
-	 * @param column
-	 * @param att2defTable
-	 * @throws SQLException
-	 * @throws Exception
-	 */
-	private void putMeaningAttributes(ArrayList<String> attributesArray, Integer meaningId,
-			String table, String column, String att2defTable) throws SQLException, Exception {
-		// If the meaning has none of these Attributes, no problem.  Just return happy.
-		if (attributesArray == null) {
-			return;
-		}
-		// Insert the Definition's child Attribute records
-		for (String attribute : attributesArray) {
-			// If the Attribute is missing in its static table, insert it
-			staticTable.insertIfMissing(table, attribute);
-			// Link this Attribute to this Definition
-			rowWriter.writeAttrToMeaning(att2defTable, column, attribute, meaningId);
+	private void putAttributeTag(EdictEnum eEnum, String tag) throws SQLException {
+		String table = eEnum.getTable();
+		String column = eEnum.getColumn();
+		if (! eEnum.isWritten(tag)) {
+			boolean present = rowReader.isRowPresent(table, column, tag, true);
+			if (! present) {
+				rowWriter.writeRow(table, column, tag, true);
+				eEnum.written(tag);
+			}
 		}
 	}
-
-	/**
-	 * Split entry into one or, optionally, two parts
-	 * @param text
-	 * @param delimiter
-	 * @return
-	 */
-	private ArrayList<String> splitAndTrim(String text, String delimiter) {
-		ArrayList<String> ret = new ArrayList<String>();
-		// If there could be more than two parts, force all into only two
-		String [] tS = text.split(delimiter, 2);
-		ret.add(tS[0]);
-		if (tS.length > 1) {
-			String tS1 = tS[1].trim();
-			ret.add(tS1);
+	private void putAttributes(ArrayList<String> attrArray, EdictEnum eEnum, Integer parentId) throws SQLException {
+		// If the attribute array is null, just return happy
+		if (attrArray == null) {
+			return;
 		}
-		return ret;
+		String column = eEnum.getColumn();
+		String toTable = eEnum.getToTable();
+		String toColumn = eEnum.getToColumn();
+		for (String tag : attrArray) {
+			tag = eEnum.getTag(tag);
+			putAttributeTag(eEnum, tag);
+			String columnList = column + "," + toColumn;
+			String valuesList = "'" + tag + "'," + parentId;
+			rowWriter.writeRow(toTable, columnList, valuesList, false);
+		}
 	}
 
 	/**
@@ -261,19 +246,18 @@ public class EdictToDatabase {
 			return;
 		}
 		for (String alt : altLangArray) {
-			String columnList = null;
-			String valuesList = null;
-			ArrayList<String> altParts = splitAndTrim(alt, ":");
-			String lang = altParts.get(0);
-			String term = "";
-			if (altParts.size() > 1) {
-				term = altParts.get(1).replaceAll("'", "''");
+			String lang = eLanguage.getTag(alt);
+			String term = eLanguage.getText(alt);
+			if (term.length() > 1) {
+				term = term.replaceAll("'", "''");
 			}
-			columnList = "language,meaningId,term";
-			valuesList = "'" + lang + "'," + meaningId + ",'" + term + "'";
+			String columnList = "language,meaningId,term";
+			String valuesList = "'" + lang + "'," + meaningId + ",'" + term + "'";
 			// Add language to Languages table, if missing
-			staticTable.insertIfMissing(TnProp.TABLE_LANGUAGES, lang);
-			rowWriter.writeRow(TnProp.TABLE_ALTLANGUAGES2MEANINGS, columnList, valuesList, false);
+			ArrayList<String> tA = new ArrayList<String>();
+			tA.add(alt);
+			putAttributeTag(eLanguage, lang);
+			rowWriter.writeRow(eLanguage.getToTable(), columnList, valuesList, false);
 		}
 	}
 
@@ -285,14 +269,13 @@ public class EdictToDatabase {
 		for (String w : waseiArray) {
 			String columnList = null;
 			String valuesList = null;
-			ArrayList<String> waseiParts = splitAndTrim(w, ":");
-			String term = "";
-			if (waseiParts.size() > 1) {
-				term = waseiParts.get(1).replaceAll("'", "''");
+			String term = eWasei.getText(w);
+			if (term.length() > 1) {
+				term = term.replaceAll("'", "''");
 			}
-			columnList = "wasei,meaningId";
+			columnList = eWasei.getColumn() + "," + eWasei.getToColumn(); // "wasei,meaningId";
 			valuesList = "'" + term + "'," + meaningId;
-			rowWriter.writeRow(TnProp.TABLE_WASEI2MEANINGS, columnList, valuesList, false);
+			rowWriter.writeRow(eWasei.getToTable(), columnList, valuesList, false);
 		}
 	}
  
@@ -302,27 +285,16 @@ public class EdictToDatabase {
 			return;
 		}
 		for (String x : xrefArray) {
-			String columnList = null;
-			String valuesList = null;
-			ArrayList<String> xrefParts = null;
-			if (x.startsWith("cf. ")) {
-				xrefParts = splitAndTrim(x, "\\.");
-			} else if (x.startsWith("See ")){
-				xrefParts = splitAndTrim(x, " ");
-			} else {
-				System.err.println("ERROR in parsing.  This Xref is neither 'cf. ' nor 'See '.");
-				break;
+			String xref = eXref.getTag(x); // xrefParts.get(0);
+			String xrefText = eXref.getText(x); // "";
+			if (xrefText.length() > 1) {
+				xrefText = xrefText.replaceAll("'", "''");
 			}
-			String xref = xrefParts.get(0);
-			String xrefText = "";
-			if (xrefParts.size() > 1) {
-				xrefText = xrefParts.get(1).replaceAll("'", "''");
-			}
-			columnList = "xref,xrefText,meaningId";
-			valuesList = "'" + xref + "','" + xrefText + "'," + meaningId;
+			String columnList = eXref.getColumn() + ",xrefText," + eXref.getToColumn(); // "xref,xrefText,meaningId";
+			String valuesList = "'" + xref + "','" + xrefText + "'," + meaningId;
 			// Add xref to Xrefs table, if missing
-			staticTable.insertIfMissing(TnProp.TABLE_XREFS, xref);
-			rowWriter.writeRow(TnProp.TABLE_XREFS2MEANINGS, columnList, valuesList, false);
+			putAttributeTag(eXref, xref);
+			rowWriter.writeRow(eXref.getToTable(), columnList, valuesList, false);
 		}
 	}
  
@@ -343,9 +315,9 @@ public class EdictToDatabase {
 		}
 		for (String ant : antonymArray) {
 			String antonym = ant.replaceAll("'", "''");
-			String columnList = "antonym,meaningId";
+			String columnList = eAntonym.getColumn() + "," + eAntonym.getToColumn(); //  "antonym,meaningId";
 			String valuesList = "'" + antonym + "'," + meaningId;
-			rowWriter.writeRow(TnProp.TABLE_ANTONYMS2MEANINGS, columnList, valuesList, false);
+			rowWriter.writeRow(eAntonym.getToTable(), columnList, valuesList, false);
 		}
 	}
  

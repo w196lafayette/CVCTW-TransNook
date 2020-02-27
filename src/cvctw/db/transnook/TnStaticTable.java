@@ -37,6 +37,7 @@ public class TnStaticTable {
 	private TableColumnMap t2c = null;
 	private TnRowReader rowReader = null;
 	private TnRowWriter rowWriter = null;
+//	public static Context context = null;
 
 	@SuppressWarnings("unused")
 	private TnStaticTable() {
@@ -47,6 +48,7 @@ public class TnStaticTable {
 		rowReader = r;
 		rowWriter = w;
 		t2c = new TableColumnMap();
+//		context = Context.getInstance(rowReader, rowWriter);
 	}
 
 	public void insertIfMissing(String table, String inVal) throws SQLException, Exception  {

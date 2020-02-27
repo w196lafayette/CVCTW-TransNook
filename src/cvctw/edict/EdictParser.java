@@ -11,8 +11,16 @@ import java.util.ArrayList;
  */
 public class EdictParser {
 
-	static private final String WASEI = "wasei";
-	static private final String ANTONYM = "ant";
+	static private Context eContext = new Context();
+	static private ReadingInfo eReadingInfo = new ReadingInfo();
+	static private KanjiInfo eKanjiInfo = new KanjiInfo();
+	static private Sense eSense = new Sense();
+	static private Dialect eDialect = new Dialect();
+	static private Language eLanguage = new Language();
+	static private PartOfSpeech ePartOfSpeech = new PartOfSpeech();
+	static private Xref eXref = new Xref();
+	static private Wasei eWasei = new Wasei();
+	static private Antonym eAntonym = new Antonym();
 
 	static public EdictTerm getAnyTerm(String entry) {
 		// TO DO
@@ -20,11 +28,11 @@ public class EdictParser {
 		// TO DO
 		EdictTerm ret = new EdictTerm(entry, Alphabet.katakana);
 		ArrayList<String> allP = getEnclosed(entry, "(", ")");
-		ArrayList<String> riArray = getReadingInfo(allP, entry);
+		ArrayList<String> riArray = getAttributes(eReadingInfo, allP);
 		if (riArray != null) {
 			ret.readingInfo = riArray;
 		}
-		ArrayList<String> kArray = getKanjiInfo(allP, entry);
+		ArrayList<String> kArray = getAttributes(eKanjiInfo, allP);
 		if (kArray != null) {
 			ret.kanjiInfo = kArray;
 		}
@@ -40,16 +48,6 @@ public class EdictParser {
 			// if ";" not found, returns an array of one entry
 			String[] terms = tokens[0].split(";");
 			for (int i = 0; i < terms.length; i++) {
-//				EdictTerm t = new EdictTerm(terms[i], Alphabet.katakana);
-//				ArrayList<String> allP = getEnclosed(terms[i], "(", ")");
-//				ArrayList<String> riArray = getReadingInfo(allP, terms[i]);
-//				if (riArray != null) {
-//					t.readingInfo = riArray;
-//				}
-//				ArrayList<String> kArray = getKanjiInfo(allP, terms[i]);
-//				if (kArray != null) {
-//					t.kanjiInfo = kArray;
-//				}
 				EdictTerm t = getAnyTerm(terms[0]);
 				t.type = EdictTerm.EdictTermType.major;
 				ret.add(t);
@@ -111,7 +109,7 @@ public class EdictParser {
 				if (tRet != null && tRet.size() > 0) {
 					ret = tRet;
 				}
-			} else if (PartOfSpeech.isPartOfSpeech(p) == true) {
+			} else if (ePartOfSpeech.isValid(p) == true) {
 				if (ret == null) {
 					ret = new ArrayList<String>();
 				}
@@ -121,42 +119,10 @@ public class EdictParser {
 		return ret;
 	}
 
-	static public ArrayList<String> getContext(ArrayList<String> allP, String entry) {
+	static public ArrayList<String> getAttributes(EdictEnum eEnum, ArrayList<String> allP) {
 		ArrayList<String> ret = null;
 		for (String p : allP) {
-			if (Context.isContext(p) == true) {
-				if (ret == null) {
-					ret = new ArrayList<String>();
-				}
-				ret.add(p);
-			}
-		}
-		return ret;
-	}
-
-	static public ArrayList<String> getSense(ArrayList<String> allP, String entry) {
-		ArrayList<String> ret = null;
-		for (String p : allP) {
-			if (Sense.isSense(p) == true) {
-				if (ret == null) {
-					ret = new ArrayList<String>();
-				}
-				ret.add(p);
-			}
-		}
-		return ret;
-	}
-
-	static public ArrayList<String> getDialect(ArrayList<String> allP, String entry) {
-		ArrayList<String> ret = null;
-		for (String p : allP) {
-			if (p.contains(":")) {
-				String[] tD = p.split(":");
-				if (tD != null && tD.length > 0) {
-					p = tD[0];
-				}
-			}
-			if (Dialect.isDialect(p) == true) {
+			if (eEnum.isValid(p) == true) {
 				if (ret == null) {
 					ret = new ArrayList<String>();
 				}
@@ -169,23 +135,11 @@ public class EdictParser {
 	static public ArrayList<String> getAltLanguage(ArrayList<String> allP, String entry) {
 		ArrayList<String> ret = null;
 		for (String p : allP) {
-			if (p.contains(":")) {
-				String lang = null;
-				String[] tD = p.split(":");
-				if (tD != null && tD.length > 0) {
-					lang = tD[0];
+			if (eLanguage.isValid(p)) {
+				if (ret == null) {
+					ret = new ArrayList<String>();
 				}
-				if (lang != null && Language.isLanguage(lang) == true) {
-					if (ret == null) {
-						ret = new ArrayList<String>();
-					}
-					if (tD.length > 1) {
-						String saveP = p;
-						ret.add(saveP);
-					} else {
-						ret.add(lang);
-					}
-				}
+				ret.add(p);
 			}
 		}
 		return ret;
@@ -207,14 +161,19 @@ public class EdictParser {
 	static public ArrayList<String> getWasei(ArrayList<String> allP, String entry) {
 		ArrayList<String> ret = null;
 		for (String p : allP) {
-			if (p.startsWith(WASEI + ":")) {
+			if (eWasei.isValid(p)) {
+				//			if (p.startsWith(WASEI + ":")) {
 				if (ret == null) {
 					ret = new ArrayList<String>();
 				}
 				if (p.contains(",")) {
 					String[] tW = p.split(",");
 					for (int i = 0; i < tW.length; i++) {
-						ret.add(tW[i].replace(WASEI + ":", "").trim());
+						if (eWasei.isValid(tW[i])) {
+							ret.add(eWasei.getText(tW[i]));
+						} else {
+							ret.add(tW[i]);
+						}
 					}
 				} else {
 					ret.add(p);
@@ -227,7 +186,7 @@ public class EdictParser {
 	static public ArrayList<String> getXref(ArrayList<String> allP, String entry) {
 		ArrayList<String> ret = null;
 		for (String p : allP) {
-			if (Xref.isXref(p) == true) {
+			if (eXref.isValid(p) == true) {
 				if (ret == null) {
 					ret = new ArrayList<String>();
 				}
@@ -243,16 +202,16 @@ public class EdictParser {
 	 * 
 	 * @param allP
 	 * @param entry
-	 * @return
+	 * @return list of all Antonyms found in this Meaning
 	 */
 	static public ArrayList<String> getAntonym(ArrayList<String> allP, String entry) {
 		ArrayList<String> ret = null;
 		for (String p : allP) {
-			if (p.startsWith(ANTONYM + ": ")) {
+			if (eAntonym.isValid(p)) {
 				if (ret == null) {
 					ret = new ArrayList<String>();
 				}
-				p = p.replace(ANTONYM + ": ", "");
+				p = eAntonym.getText(p);
 				if (p.contains(",")) {
 					String[] tA = p.split(",");
 					for (int i = 0; i < tA.length; i++) {
@@ -266,36 +225,6 @@ public class EdictParser {
 		return ret;
 	}
 
-	/**
-	 * 
-	 * @param allP
-	 * @param term
-	 * @return list of all ReadingInfo tokens in this Term
-	 */
-	static public ArrayList<String> getReadingInfo(ArrayList<String> allP, String term) {
-		ArrayList<String> ret = null;
-		for (String p : allP) {
-			if (ReadingInfo.isReadingInfo(p) == true) {
-				if (ret == null) {
-					ret = new ArrayList<String>();
-				}
-				ret.add(p);
-			}
-		}
-		return ret;
-	}
-	static public ArrayList<String> getKanjiInfo(ArrayList<String> allP, String term) {
-		ArrayList<String> ret = null;
-		for (String p : allP) {
-			if (KanjiInfo.isKanjiInfo(p) == true) {
-				if (ret == null) {
-					ret = new ArrayList<String>();
-				}
-				ret.add(p);
-			}
-		}
-		return ret;
-	}
 	static public ArrayList<String> getEnclosed(String entry, String open, String close) {
 		ArrayList<String> ret = new ArrayList<String>();
 		int startIdx = 0;
@@ -310,7 +239,6 @@ public class EdictParser {
 			}
 			String encl = entry.substring(startIdx + 1, endIdx);
 			ret.add(encl);
-//			System.out.println("encl=" + encl);
 			startIdx = endIdx + close.length();
 		}
 		return ret;
@@ -344,7 +272,7 @@ public class EdictParser {
 	/**
 	 * Calculates the index of all "marker" tokens
 	 * @param entry
-	 * @return
+	 * @return array of "marker" indices
 	 */
 	static private ArrayList<Integer> defMarkers(String entry) {
 		ArrayList<Integer> ret = new ArrayList<Integer>();
@@ -399,13 +327,10 @@ public class EdictParser {
 			// if this is the last one, make it simple and stop
 			if (markerIdx == markerCt - 1) {
 				next = slashIdx.get(slashIdx.size() - 2);
-//				System.out.println("last entry=" + entry + "\n prev=" + prev + ", next=" + next + 
-//						", beginIdx=" + markersIdx.get(markerIdx) + ", beginIdx[+1]=" + slashIdx.get(slashIdx.size() - 2));
 			} else {
 				// tricky: find the slash before the next "marker"
 				int nextM = markersIdx.get(markerIdx + 1);
 				next = previousSlash(entry, nextM + 1);
-//				System.out.println("entry=" + entry + "\n prev=" + prev + ", next=" + next + ", beginIdx=" + markersIdx.get(markerIdx) + ", beginIdx[+1]=" + markersIdx.get(markerIdx+1));
 			}
 			String def = entry.substring(prev + 1, next);
 			ret.add(def);
@@ -426,14 +351,14 @@ public class EdictParser {
 		ArrayList<String> allP = getEnclosed(meaning, "(", ")");
 		// enclosed in curly brackets
 		ArrayList<String> allB = getEnclosed(meaning, "{", "}");
-		
-		ArrayList<String> context = getContext(allB, meaning);
+	
+		ArrayList<String> context = getAttributes(eContext, allB);
 		ret.setContext(context);
 		ArrayList<String> partOfSpeech = getPartOfSpeech(allP, meaning);
 		ret.setPartOfSpeech(partOfSpeech);
-		ArrayList<String> sense = getSense(allP, meaning);
+		ArrayList<String> sense = getAttributes(eSense, allP);
 		ret.setSense(sense);
-		ArrayList<String> dialect = getDialect(allP, meaning);
+		ArrayList<String> dialect = getAttributes(eDialect, allP);
 		ret.setDialect(dialect);
 		ArrayList<String> altLanguage = getAltLanguage(allP, meaning);
 		ret.setAltLanguage(altLanguage);
@@ -461,15 +386,6 @@ public class EdictParser {
 		}
 		return ret;
 	}
-
-//	static public ArrayList<EdictMeaning> getMeanings(String def) {
-//		ArrayList<EdictMeaning> ret = new ArrayList<EdictMeaning>();
-//		ArrayList<String> meanings = splitMeanings(def);
-//		for (int i = 0; i < meanings.size(); i++) {
-//			ret.add(createMeaning(i + 1, meanings.get(i)));
-//		}
-//		return ret;
-//	}
 
 	static public String getEdictId(String entry) {
 		String ret = null;

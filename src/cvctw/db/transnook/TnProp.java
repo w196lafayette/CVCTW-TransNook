@@ -44,11 +44,15 @@ public class TnProp {
 	public static final String TABLE_SENSES = "senses";
 	public static final String COLUMN_SENSES = "sense";
 	public static final String TABLE_SENSES2MEANINGS = "senses2meanings";
+	public static final String COLUMN_WASEI = "wasei";
 	public static final String TABLE_WASEI2MEANINGS = "wasei2meanings";
 	public static final String TABLE_XREFS = "xrefs";
 	public static final String COLUMN_XREFS = "xref";
 	public static final String TABLE_XREFS2MEANINGS = "xrefs2meanings";
+	public static final String COLUMN_ANTONYMS = "antonym";
 	public static final String TABLE_ANTONYMS2MEANINGS = "antonyms2meanings";
+	public static final String COLUMN_MEANING_ID = "meaningId";
+	public static final String COLUMN_TERM_ID = "termId";
 
 	public static final String PROP_PROTOCOL = "tnConnProtocol";
 	public static final String PROP_HOST = "tnConnHost";
