@@ -65,9 +65,59 @@ PRIMARY KEY (id),
 entryId INTEGER NOT NULL,
 FOREIGN KEY (entryId) REFERENCES entries (id),
 term VARCHAR(512) CHARACTER SET binary NOT NULL,
+INDEX(term),
 alphabet VARCHAR(64) DEFAULT 'latin',
 FOREIGN KEY(alphabet) REFERENCES alphabets(alphabet),
-UNIQUE INDEX(entryId,term,alphabet)
+-- UNIQUE INDEX(entryId,term,alphabet),
+termType CHAR NOT NULL,
+-- m=major, a=alternate
+CONSTRAINT term_type_check CHECK (termType IN ('m','a'))
+);
+-- 
+-- table=READINGINFO
+--
+CREATE TABLE readinginfo
+(
+id INTEGER NOT NULL AUTO_INCREMENT,
+PRIMARY KEY (id),
+info VARCHAR(32) NOT NULL,
+UNIQUE INDEX (info)
+);
+-- 
+-- table=KANJIINFO
+--
+CREATE TABLE kanjiinfo
+(
+id INTEGER NOT NULL AUTO_INCREMENT,
+PRIMARY KEY (id),
+info VARCHAR(32) NOT NULL,
+UNIQUE INDEX (info)
+);
+-- 
+-- table=READINGINFO2TERMS
+-- 
+CREATE TABLE readinginfo2terms
+(
+id INTEGER NOT NULL AUTO_INCREMENT,
+PRIMARY KEY (id),
+termId INTEGER NOT NULL,
+FOREIGN KEY (termId) REFERENCES terms(id),
+info VARCHAR(32) NOT NULL,
+FOREIGN KEY (info) REFERENCES readinginfo(info),
+UNIQUE INDEX (termId,info)
+);
+-- 
+-- table=KANJIINFO2TERMS
+-- 
+CREATE TABLE kanjiinfo2terms
+(
+id INTEGER NOT NULL AUTO_INCREMENT,
+PRIMARY KEY (id),
+termId INTEGER NOT NULL,
+FOREIGN KEY (termId) REFERENCES terms(id),
+info VARCHAR(32) NOT NULL,
+FOREIGN KEY (info) REFERENCES kanjiinfo(info),
+UNIQUE INDEX (termId,info)
 );
 -- 
 -- table=DEFINITIONS
@@ -78,6 +128,7 @@ CREATE TABLE definitions
 id INTEGER NOT NULL AUTO_INCREMENT,
 PRIMARY KEY (id),
 entryId INTEGER NOT NULL,
+FOREIGN KEY (entryId) REFERENCES entries (id),
 defOrder INTEGER NOT NULL,
 UNIQUE INDEX (defOrder, entryId),
 definition VARCHAR(2048) NOT NULL,
@@ -92,11 +143,14 @@ CREATE TABLE meanings
 (
 id INTEGER NOT NULL AUTO_INCREMENT,
 PRIMARY KEY (id),
+entryId INTEGER NOT NULL,
+FOREIGN KEY (entryId) REFERENCES entries (id),
 defId INTEGER NOT NULL,
 FOREIGN KEY (defId) REFERENCES definitions (id),
 meaningOrder INTEGER NOT NULL,
 UNIQUE INDEX (meaningOrder, defId),
-meaning VARCHAR(2048) NOT NULL
+meaning VARCHAR(512) NOT NULL,
+INDEX (meaning)
 ) CHARSET=utf8mb4;
 -- 
 -- table=CONTEXT2MEANINGS
