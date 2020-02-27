@@ -7,6 +7,29 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 /**
+ * <p>
+ * This class creates an in-memory, Java replication of the JMdict/EDICT Japanese-English dictionary.
+ * The dictionary is a file, updated daily and available for download free  
+ * from http://www.edrdg.org/jmdict/edict.html.
+ * As of February 2020 the dictionary has 186,000+ entries.
+ * </p>
+ * <p>
+ * Similar to the familiar book-form dictionaries, like Webster's, the JMdict/EDICT dictionary
+ * is made up of <b>entries</b>, each of which defines a word or a phrase.
+ * Each line of the JMdict/EDICT file is an <b>entry</b>.
+ * </p>
+ * <p>
+ * The <b>main</b> method of this class
+ * <ul>
+ * <li>instantiates the EdictReader class to read the JMdict/EDICT file, one line at a time, into memory.
+ * Each line of the file becomes an item in the class' <i>ArrayList&lt;String&gt; contents</i> member.
+ * The EdictReader class performs no parsing and no conversions</li>
+ * <li>instantiates the Dictionary class to parse each item (line) of the EdictReader's <i>contents</i>.
+ * Each line becomes an instance of the <i>EdictEntry</i> class.</li>
+ * </ul>
+ * 
+ * </p>
+ * 
  * @author minge
  *
  */

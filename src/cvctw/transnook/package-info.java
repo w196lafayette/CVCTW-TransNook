@@ -1,16 +1,14 @@
 /**
  * <p>
- * The cvctw.transnook package contains one class, EdictToDatabase.
- * </p>
- * <p>
- * The EdictToDatabase class executes all functionality of the TransNook project, namely
+ * The cvctw.transnook package contains one class, <i>EdictToDatabase</i>, which
+ * creates the CVCTW TransNook database.  The class
  * </p>
  * <ol>
  * <li>
- * reads the Japanese eDict file
+ * reads the Japanese-English JMdict/EDICT file
  * </li>
  * <li>
- *  converts each eDict entry to a hierarchy of Java instances (under the "parent" EdictEntry instance)
+ *  converts each JMdict/EDICT entry to a hierarchy of Java instances (under the "parent" EdictEntry instance)
  * </li>
  * <li>
  * writes each Java EdictEntry instance to the database

@@ -9,17 +9,9 @@ import cvctw.db.transnook.TnProp;
 
 /**
  * <p>
- * This class 
- * <ul>
- * <li>
- * declares the valid Languages recognized by the JMdict/EDICT file
- * </li>
- * <li>
- * and provides a method to validate that a candidate values is a Language
- * </li>
- * </ul>
- * </p>
- * 
+ * This class implements the methods of the EdictEnum interface.
+ * <br>
+ * See the EdictEnum javadoc item for a description of the purpose of each method.
  * @author minge
  *
  */

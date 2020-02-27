@@ -14,18 +14,9 @@ import cvctw.db.transnook.TnProp;
  * Xref, meaning "cross reference"
  * </p>
  * <p>
- * This class 
- * <ul>
- * <li>declares the valid Xrefs recognized by the JMdict/EDICT file</li>
- * <li>and provides a method to validate that a candidate value is an Xref</li>
- * </ul>
- * </p>
- * <p>
- * The two valid formats of Xrefs in the JMdict/EDICT file are
- * <ul>
- * <li>"cf. [text]"</li>
- * <li>"See [text]"</li>
- * </ul>
+ * This class implements the methods of the EdictEnum interface.
+ * <br>
+ * See the EdictEnum javadoc item for a description of the purpose of each method.
  * </p>
  * @author minge
  *
