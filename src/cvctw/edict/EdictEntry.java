@@ -20,7 +20,7 @@ public class EdictEntry {
 	public ArrayList<EdictTerm> terms;
 	public ArrayList<EdictDefinition> definitions;
 	public String eDictId;
-	public Source source;
+	public Source.SourceE sourceE;
 
 	public EdictEntry() {
 	}
@@ -31,7 +31,7 @@ public class EdictEntry {
 		e.definitions = new ArrayList<EdictDefinition>();
 		e.id = null;
 		e.language = TnProp.DEFAULT_TERM_LANGUAGE;
-		e.source = Source.E;
+		e.sourceE = Source.SourceE.E;
 	}
 
 	public EdictEntry(String entry) {
@@ -61,7 +61,7 @@ public class EdictEntry {
 	public String entryOnly() {
 		String ret = "id=" + id + ", entry=" + entry + 
 				", language=" + language + ", eDictId=" + eDictId +
-				", source=" + source;
+				", sourceE=" + sourceE;
 		return ret;
 	}
 
@@ -123,6 +123,14 @@ public class EdictEntry {
 		}
 		ret = ret + "eDictId=" + eDictId;
 		return ret;
+	}
+
+	static public String getTable() {
+		return TnProp.TABLE_ENTRIES;
+	}
+
+	static public String getColumnList() {
+		return " (entry,language,eDictId,source)";
 	}
 
 }

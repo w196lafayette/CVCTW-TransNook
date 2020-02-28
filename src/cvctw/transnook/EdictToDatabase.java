@@ -12,7 +12,7 @@ import cvctw.db.transnook.TnConnection;
 import cvctw.db.transnook.TnProp;
 import cvctw.db.transnook.TnRowReader;
 import cvctw.db.transnook.TnRowWriter;
-import cvctw.db.transnook.TnStaticTable;
+import cvctw.edict.Alphabet;
 import cvctw.edict.Antonym;
 import cvctw.edict.Context;
 import cvctw.edict.Dialect;
@@ -41,7 +41,6 @@ public class EdictToDatabase {
 	private ArrayList<EdictEntry> dictEntries = null;
 	private TnRowReader rowReader = null;
 	private TnRowWriter rowWriter = null;
-	private TnStaticTable staticTable = null;
 	private TnConnection tnConnection = null;
 	private Integer entryFailures = 0;
 	private Integer maxEntryFailures = 0;
@@ -55,6 +54,7 @@ public class EdictToDatabase {
 	private static Wasei eWasei = new Wasei();
 	private static Xref eXref = new Xref();
 	private static Antonym eAntonym = new Antonym();
+	private static Alphabet eAlphabet = new Alphabet();
 
 
 	EdictToDatabase(String eDictPath, String propPath) throws IOException, FileNotFoundException, SQLException {
@@ -73,7 +73,6 @@ public class EdictToDatabase {
 		tnConnection.tnConnDataSource();
 		rowReader = new TnRowReader();
 		rowWriter = new TnRowWriter();
-		staticTable = new TnStaticTable(rowReader, rowWriter);
 		maxEntryFailures = TnProp.getInstance().getDbMaxEntryFailures();
 	}
 
@@ -112,10 +111,10 @@ public class EdictToDatabase {
 		// Escape any apostrophes in the entry
 		String newEntry = dE.entry.replaceAll("'", "''");
 		dE.entry = newEntry;
-		// Convert enum "source" to char
-		char source = dE.source.toString().charAt(0);
+		// Convert enum "sourceE" to char
+		char source = dE.sourceE.toString().charAt(0);
 		// If the language is missing in its static table, insert it
-		staticTable.insertIfMissing(TnProp.TABLE_LANGUAGES, dE.language);
+		putAttributeTag(eLanguage, dE.language.toString());
 		// Insert parent Entry record, capture its new ID
 		Integer entryId = rowWriter.writeEntry(dE, source);
 		// Insert child Term records
@@ -154,8 +153,8 @@ public class EdictToDatabase {
 		// Escape any apostrophes in the term (unlikely, but possible
 		String newTerm = t.term.replaceAll("'", "''");
 		t.term = newTerm;
-		// If the alphabet is missing in its static table, insert it
-		staticTable.insertIfMissing(TnProp.TABLE_ALPHABETS, t.alphabet.toString());
+		// If the alphabetE is missing in its static table, insert it
+		putAttributeTag(eAlphabet, t.alphabetE.toString());
 		// Get the parent Entry's id
 		t.entryId = entryId;
 		// Insert Term
@@ -176,7 +175,7 @@ public class EdictToDatabase {
 		String newDef = d.definition.replaceAll("'", "''");
 		d.definition = newDef;
 		// If the Definition's language is missing in its static table, insert it
-		staticTable.insertIfMissing(TnProp.TABLE_LANGUAGES, d.language);
+		putAttributeTag(eLanguage, d.language.toString());
 		// Get the parent Entry's id
 		d.entryId = entryId;
 		// Insert Definition and save its new id
@@ -205,7 +204,7 @@ public class EdictToDatabase {
 		return meaningId;
 	}
 
-	private void putAttributeTag(EdictEnum eEnum, String tag) throws SQLException {
+	public void putAttributeTag(EdictEnum eEnum, String tag) throws SQLException {
 		String table = eEnum.getTable();
 		String column = eEnum.getColumn();
 		if (! eEnum.isWritten(tag)) {

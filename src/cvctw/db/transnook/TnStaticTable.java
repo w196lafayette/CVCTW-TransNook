@@ -3,7 +3,6 @@
  */
 package cvctw.db.transnook;
 
-import java.sql.SQLException;
 import java.util.TreeMap;
 
 /**
@@ -34,9 +33,9 @@ public class TnStaticTable {
 		}
 	}
 
-	private TableColumnMap t2c = null;
-	private TnRowReader rowReader = null;
-	private TnRowWriter rowWriter = null;
+//	private TableColumnMap t2c = null;
+//	private TnRowReader rowReader = null;
+//	private TnRowWriter rowWriter = null;
 //	public static Context context = null;
 
 	@SuppressWarnings("unused")
@@ -45,19 +44,19 @@ public class TnStaticTable {
 	}
 
 	public TnStaticTable(TnRowReader r, TnRowWriter w) {
-		rowReader = r;
-		rowWriter = w;
-		t2c = new TableColumnMap();
+//		rowReader = r;
+//		rowWriter = w;
+//		t2c = new TableColumnMap();
 //		context = Context.getInstance(rowReader, rowWriter);
 	}
 
-	public void insertIfMissing(String table, String inVal) throws SQLException, Exception  {
-		String column = t2c.column(table);
-		boolean isHere = rowReader.isRowPresent(table, column, inVal, true);
-		if (isHere != true) {
-			rowWriter.writeRow(table, column, inVal, true);
-		}
-	}
+//	public void insertIfMissing(String table, String inVal) throws SQLException, Exception  {
+//		String column = t2c.column(table);
+//		boolean isHere = rowReader.isRowPresent(table, column, inVal, true);
+//		if (isHere != true) {
+//			rowWriter.writeRow(table, column, inVal, true);
+//		}
+//	}
 	
 //	public Integer insertIfMissing(String table, String column1, String inVal1, String column2, String inVal2) 
 //			throws SQLException, Exception  {

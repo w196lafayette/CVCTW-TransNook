@@ -70,7 +70,7 @@ public class Dictionary {
 		for (EdictEntry e : dE) {
 			System.out.println("\nENTRY: " + e.entryOnly());
 			for (EdictTerm t : e.terms) {
-				System.out.println("TERM: " + t.toString() + ", alphabet=" + t.alphabet + ", type=" + t.type);
+				System.out.println("TERM: " + t.toString() + ", alphabetE=" + t.alphabetE + ", type=" + t.type);
 				if (t.readingInfo != null) {
 					System.out.print("TERM-READING-INFO: ");
 					for (String ri : t.readingInfo) {

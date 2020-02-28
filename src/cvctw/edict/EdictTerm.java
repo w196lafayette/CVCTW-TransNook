@@ -2,6 +2,8 @@ package cvctw.edict;
 
 import java.util.ArrayList;
 
+import cvctw.db.transnook.TnProp;
+
 public class EdictTerm {
 	public enum EdictTermType {
 		major,
@@ -10,7 +12,7 @@ public class EdictTerm {
 	public Integer entryId;
 	public Integer id;
 	public String term;
-	public Alphabet alphabet;
+	public Alphabet.AlphabetE alphabetE;
 	public EdictTermType type;
 	public ArrayList<String> readingInfo;
 	public ArrayList<String> kanjiInfo;
@@ -19,13 +21,13 @@ public class EdictTerm {
 		entryId = null;
 		id = null;
 		term = null;
-		alphabet = null;
+		alphabetE = null;
 		type = null;
 	}
 
-	public EdictTerm(String term, Alphabet alphabet) {
+	public EdictTerm(String term, Alphabet.AlphabetE alphabetE) {
 		this.term = term;
-		this.alphabet = alphabet;
+		this.alphabetE = alphabetE;
 		entryId = null;
 		id = null;
 	}
@@ -40,8 +42,20 @@ public class EdictTerm {
 
 	public String toString() {
 		String ret = "entryId=" + entryId + ", id=" + id + 
-				", term=" + term + ", alphabet=" + alphabet + ", type=" + type;
+				", term=" + term + ", alphabetE=" + alphabetE + ", type=" + type;
 		return ret;
+	}
+
+	static public String getTable() {
+		return TnProp.TABLE_TERMS;
+	}
+
+	static public String getParentTable() {
+		return TnProp.TABLE_ENTRIES;
+	}
+
+	static public String getColumnList() {
+		return " (entryId,term,alphabet,termType)";
 	}
 
 }

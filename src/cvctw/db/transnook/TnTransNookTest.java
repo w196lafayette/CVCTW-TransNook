@@ -14,10 +14,14 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import cvctw.edict.Alphabet;
+import cvctw.edict.Alphabet.AlphabetE;
+import cvctw.edict.Context;
 import cvctw.edict.EdictDefinition;
-import cvctw.edict.EdictMeaning;
 import cvctw.edict.EdictEntry;
+import cvctw.edict.EdictEnum;
+import cvctw.edict.EdictMeaning;
 import cvctw.edict.EdictTerm;
+import cvctw.edict.Language;
 
 /**
  * @author minge
@@ -139,7 +143,7 @@ public class TnTransNookTest {
 			nLong = -nLong;
 		}
 		t.term = "new term " + t.id + " for entry " + t.entryId + " term=" + nLong;
-		t.alphabet = Alphabet.katakana;
+		t.alphabetE = AlphabetE.katakana;
 		Integer newId = rowWriter.writeTerm(t);
 		t.id = newId;
 		System.out.println("new term: " + t);
@@ -185,13 +189,28 @@ public class TnTransNookTest {
 		boolean pI = rowReader.isRowPresent(TnProp.TABLE_ENTRIES, "id", "1", false);
 		System.out.println("does table entries have a row with id=1? " + pI);
 	}
+	public void tnPutAttributeTag(EdictEnum eEnum, String tag) throws SQLException {
+		String table = eEnum.getTable();
+		String column = eEnum.getColumn();
+		if (! eEnum.isWritten(tag)) {
+			boolean present = rowReader.isRowPresent(table, column, tag, true);
+			if (! present) {
+				rowWriter.writeRow(table, column, tag, true);
+				eEnum.written(tag);
+			}
+		}
+	}
 	public void staticTable() throws SQLException, Exception {
-		TnStaticTable sT = new TnStaticTable(rowReader, rowWriter);
-		sT.insertIfMissing("languages", "eng");
-		sT.insertIfMissing("languages", "jap");
-		sT.insertIfMissing("alphabets", "katakana");
-		sT.insertIfMissing("contexts", "econ");
-		sT.insertIfMissing("contexts", "biol");
+		tnPutAttributeTag(new Language(), "eng");
+		tnPutAttributeTag(new Language(), "jap");
+		tnPutAttributeTag(new Alphabet(), "katakana");
+		tnPutAttributeTag(new Context(), "econ");
+//		TnStaticTable sT = new TnStaticTable(rowReader, rowWriter);
+//		sT.insertIfMissing("languages", "eng");
+//		sT.insertIfMissing("languages", "jap");
+//		sT.insertIfMissing("alphabets", "katakana");
+//		sT.insertIfMissing("contexts", "econ");
+//		sT.insertIfMissing("contexts", "biol");
 	}
 	/**
 	 * @param args

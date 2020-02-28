@@ -135,7 +135,7 @@ public class TnRowReader {
 		e.entry = rs.getString("entry");
 		e.language = rs.getString("language");
 		e.eDictId = rs.getString("eDictId");
-		e.source = Source.valueOf(rs.getString("source"));
+		e.sourceE = Source.SourceE.valueOf(rs.getString("source"));
 		return e;
 	}
 	public ArrayList<EdictTerm> readTerms() throws SQLException {
@@ -169,7 +169,7 @@ public class TnRowReader {
 		t.entryId = rs.getInt("entryId");
 		t.id = rs.getInt("id");
 		t.term = rs.getString("term");
-		t.alphabet = Alphabet.valueOf(rs.getString("alphabet"));
+		t.alphabetE = Alphabet.AlphabetE.valueOf(rs.getString("alphabet"));
 		return t;
 	}
 

@@ -24,9 +24,9 @@ public class EdictParser {
 
 	static public EdictTerm getAnyTerm(String entry) {
 		// TO DO
-		// TO DO: detect the alphabet
+		// TO DO: detect the alphabetE
 		// TO DO
-		EdictTerm ret = new EdictTerm(entry, Alphabet.katakana);
+		EdictTerm ret = new EdictTerm(entry, Alphabet.AlphabetE.katakana);
 		ArrayList<String> allP = getEnclosed(entry, "(", ")");
 		ArrayList<String> riArray = getAttributes(eReadingInfo, allP);
 		if (riArray != null) {
@@ -82,7 +82,7 @@ public class EdictParser {
 		// if ";" not found, returns an array of one entry
 		String[] tok = alt.split(";");
 		for (String t : tok) {
-			// TO DO: detect the alphabet
+			// TO DO: detect the alphabetE
 			EdictTerm term = getAnyTerm(t.replace("]", ""));
 			term.type = EdictTerm.EdictTermType.alternate;
 			ret.add(term);

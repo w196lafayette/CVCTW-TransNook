@@ -159,20 +159,20 @@ CREATE TABLE contexts2meanings
 (
 id INTEGER NOT NULL AUTO_INCREMENT,
 PRIMARY KEY (id),
-context VARCHAR(64),
-FOREIGN KEY (context) REFERENCES contexts (context),
 meaningId INTEGER,
 FOREIGN KEY (meaningId) REFERENCES meanings (id),
+context VARCHAR(64),
+FOREIGN KEY (context) REFERENCES contexts (context),
 UNIQUE INDEX (context, meaningId)
 );
 CREATE TABLE partsOfSpeech2meanings
 (
 id INTEGER NOT NULL AUTO_INCREMENT,
 PRIMARY KEY (id),
-part VARCHAR(64),
-FOREIGN KEY (part) REFERENCES partsOfSpeech (part),
 meaningId INTEGER,
 FOREIGN KEY (meaningId) REFERENCES meanings (id),
+part VARCHAR(64),
+FOREIGN KEY (part) REFERENCES partsOfSpeech (part),
 UNIQUE INDEX (part, meaningId)
 );
 CREATE TABLE senses
@@ -184,10 +184,10 @@ CREATE TABLE senses2meanings
 (
 id INTEGER NOT NULL AUTO_INCREMENT,
 PRIMARY KEY (id),
-sense VARCHAR(64),
-FOREIGN KEY (sense) REFERENCES senses (sense),
 meaningId INTEGER,
 FOREIGN KEY (meaningId) REFERENCES meanings (id),
+sense VARCHAR(64),
+FOREIGN KEY (sense) REFERENCES senses (sense),
 UNIQUE INDEX (sense, meaningId)
 );
 CREATE TABLE dialects
@@ -199,20 +199,20 @@ CREATE TABLE dialects2meanings
 (
 id INTEGER NOT NULL AUTO_INCREMENT,
 PRIMARY KEY (id),
-dialect VARCHAR(64),
-FOREIGN KEY (dialect) REFERENCES dialects (dialect),
 meaningId INTEGER,
 FOREIGN KEY (meaningId) REFERENCES meanings (id),
+dialect VARCHAR(64),
+FOREIGN KEY (dialect) REFERENCES dialects (dialect),
 UNIQUE INDEX (dialect, meaningId)
 );
 CREATE TABLE altLanguages2meanings
 (
 id INTEGER NOT NULL AUTO_INCREMENT,
 PRIMARY KEY (id),
-language VARCHAR(64),
-FOREIGN KEY (language) REFERENCES languages (language),
 meaningId INTEGER,
 FOREIGN KEY (meaningId) REFERENCES meanings (id),
+language VARCHAR(64),
+FOREIGN KEY (language) REFERENCES languages (language),
 term VARCHAR(512) CHARACTER SET binary,
 UNIQUE INDEX (language,meaningId,term)
 );
@@ -220,10 +220,9 @@ CREATE TABLE wasei2meanings
 (
 id INTEGER NOT NULL AUTO_INCREMENT,
 PRIMARY KEY (id),
-wasei VARCHAR(512),
 meaningId INTEGER,
-FOREIGN KEY (meaningId) REFERENCES meanings (id) -- ,
--- UNIQUE INDEX (wasei,meaningId)
+FOREIGN KEY (meaningId) REFERENCES meanings (id),
+wasei VARCHAR(512)
 );
 CREATE TABLE xrefs
 (
@@ -234,7 +233,7 @@ CREATE TABLE xrefs2meanings
 (
 id INTEGER NOT NULL AUTO_INCREMENT,
 PRIMARY KEY (id),
-xref VARCHAR(16),
+xref VARCHAR(64),
 FOREIGN KEY (xref) REFERENCES xrefs (xref),
 xrefText VARCHAR(512) CHARACTER SET binary,
 meaningId INTEGER,
@@ -243,10 +242,12 @@ UNIQUE INDEX (xref,xrefText,meaningId)
 );
 CREATE TABLE antonyms2meanings
 (
-antonym VARCHAR(512) CHARACTER SET binary,
+id INTEGER NOT NULL AUTO_INCREMENT,
+PRIMARY KEY (id),
 meaningId INTEGER,
 FOREIGN KEY (meaningId) REFERENCES meanings (id),
-PRIMARY KEY (antonym,meaningId)
+antonym VARCHAR(512) CHARACTER SET binary,
+UNIQUE INDEX (antonym,meaningId)
 );
 -- 
 -- table=USERS

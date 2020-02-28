@@ -2,6 +2,8 @@ package cvctw.edict;
 
 import java.util.ArrayList;
 
+import cvctw.db.transnook.TnProp;
+
 public class EdictDefinition {
 	public Integer entryId;
 	public Integer id;
@@ -41,4 +43,15 @@ public class EdictDefinition {
 		return ret;
 	}
 
+	static public String getTable() {
+		return TnProp.TABLE_DEFINITIONS;
+	}
+
+	static public String getParentTable() {
+		return TnProp.TABLE_ENTRIES;
+	}
+
+	static public String getColumnList() {
+		return " (entryId,defOrder,definition,language)";
+	}
 }
