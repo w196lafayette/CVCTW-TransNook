@@ -1,0 +1,264 @@
+<head>
+<title>
+The CVCTW TransNook Project
+</title>
+</head>
+<body>
+<p>
+The purpose of the TransNook project is to make the Japanese-English
+dictionary of the JMdict/EDICT project available in a MySQL database that
+can be searched in a number of ways.
+</p>
+<h1>1. Format of JMdict/EDICT file</h1>
+<p>
+The format of the JMdict/EDICT file is - predictably - complex, but it is entirely rational.
+The official statement of the file's format is found 
+ <a href="http://www.edrdg.org/jmdictdb/cgi-bin/edhelp.py"><b>here</b></a>
+
+</p>
+<h3>A. JMdict/EDICT entities</h3>
+<p>
+For purposes of the CVCTW TransNook project, the important elements of the file's format are the four <u>entities</u>: entry, term, definition and meaning.
+<ul>
+<li>
+Each line of the file represents one dictionary <b>entry</b>, defining a term or phrase.
+<br>
+Each parsed line becomes an instance of the cvctw.edict.EdictEntry class.
+<br>
+Each <b>entry</b> ends with a unique JMdict/EDICT entry identifier of the form "EntLnnnnn", where "nnnnn" are numeric digits.
+</li>
+<li>
+Each entry may define more than one space-delimited Japanese <b>term</b> or phrase.
+<br>
+We may think of these alternative terms or phrases as synonyms.
+<br>
+Each alternative term or phrase becomes an instance of the cvctw.edict.EdictTerm class.
+
+</li>
+<li>
+Each entry may contain more than one English <b>definition</b>, delimited by a number in parentheses, e.g., (3).
+<br>
+Each definition becomes an instance of the cvctw.edict.Definition class.
+
+</li>
+<li>
+Each definition may contain more than one synonymous <b>meaning</b>, delimited by a slash ("/").
+<br>
+Each meaning becomes an instance of the cvctw.edict.EdictMeaning class.
+
+</li>
+</ul>
+
+
+</p>
+<p>
+This hierarchy of entities may be represented graphically this way:
+<pre>
+	Entries 1..n
+		Terms 1..n
+		Definitions 1..n
+			Meanings 1..n
+</pre>
+</p>
+<p>
+These parent-child <i>relationships</i> are represented in Java code thus:
+<ul>
+<li>
+The cvctw.edict.Edict<b>Entry</b> class has 
+<ul>
+<li>a list (ArrayList) of cvctw.edict.Edict<b>Term</b> classes and</li>
+<li>a list of cvctw.edict.Edict<b>Definition</b> classes.</li>
+<ul>
+<li>
+The cvctw.edict.Edict<b>Definition</b> class has a list (ArrayList) of cvctw.edict.Edict<b>Meaning</b> classes.
+</li>
+
+</ul>
+</ul>
+</li>
+</ul>
+</p>
+<h3>B. JMdict/EDICT attributes</h3>
+<p>
+Each Japanese <b>term</b> and each English <b>meaning</b> may have a number of <b>attributes</b> or annotations.
+
+</p>
+<h4>i. Attributes of Japanese terms</h4>
+<p>
+Japanese <b>terms</b> may have one or more "reading info" and one or more "kanji info" attributes.
+<ul>
+<li>
+"Reading info" attributes are represented by the cvctw.edict.ReadingInfo class.
+<br>
+Example values of "reading info" attributes are 
+<ul>
+<li>"ik" word containing irregular kanji usage</li>
+<li>"oik" old or irregular kana form</li>
+
+</ul>
+
+</li>
+<li>
+"Kanji info" attributes are represented by the cvctw.edict.KajniInfo class.
+<br>
+Example values of "kanji info" attributes are
+
+<ul>
+<li>"ateji" phonetic reading</li>
+<li>"io" irregular okurigana usage</li>
+
+</ul>
+
+</li>
+</ul>
+
+
+</p>
+<h4>ii. Attributes of English definitions</h4>
+<p>
+English <b>meanings</b> may have one or more of each of the following attributes:
+<ul>
+<li>"Part of speech" attributes are represented by the cvctw.edict.PartOfSpeech class.
+<br>
+Example values of "part of speech" attributes are
+<ul>
+<li>"adv" adverb</li>
+<li>"conj" conjunction</li>
+<li>"n" noun</li>
+
+</ul>
+</li>
+<li>"Context" (i.e., field or domain) attributes are represented by the 
+cvctw.edict.Context class.
+<br>
+Example values of "context" attributes are
+<ul>
+<li>"biol" biology term</li>
+<li>"geol" geology term</li>
+<li>"music" music term</li>
+</ul>
+</li>
+
+
+<li>"Dialect" attributes are represented by the 
+cvctw.edict.Dialect class.
+<br>
+Example values of "dialect" attributes are
+<ul>
+<li>"osb" Osaka-ben</li>
+<li>"kyb" Kyoto-ben</li>
+<li>"std" Tokyo-ben</li>
+</ul>
+</li>
+
+
+
+<li>"Sense" attributes are represented by the 
+cvctw.edict.Sense class.
+<br>
+Example values of "sense" attributes are
+<ul>
+<li>"joc" jocular, humorous term</li>
+<li>"obs" obsolete term</li>
+<li>"derog" derogatory</li>
+</ul>
+</li>
+
+
+
+
+
+
+<li>"Language" attributes are represented by the 
+cvctw.edict.Language class.
+<br>
+"Language" attributes appear in the JMdict/EDICT file followed by a colon (":") which optionally may be followed by a term or expression in that language, for example, <i>(spa: mezcal)</i>.
+<br>
+Example values of "language" attributes are
+<ul>
+<li>"bul" Bulgarian</li>
+<li>"dan" Danish</li>
+<li>"spa" Spanish</li>
+</ul>
+</li>
+
+
+
+<li>"Antonym" attributes are represented by the 
+cvctw.edict.Antonym class.
+<br>
+Each Japanese "antonym" attribute has one or more associated Japanese 
+terms, expressesd using one of the Japanese alphabets.
+</li>
+
+<li>"Xref" (cross-reference) attributes are represented by the 
+cvctw.edict.Xref class.
+<br>
+Each Japanese "xref" attribute has one or more associated Japanese 
+terms, expressesd using one of the Japanese alphabets.
+<br>
+These "xref" attributes appear in the JMdict/EDICT file as 
+"See xxxx" annotations.
+</li>
+
+
+
+<li>"Wasei" attributes are represented by the 
+cvctw.edict.Wasei class.
+<br>
+Wasei-eigo are Japanese-language expressions based on English words or parts of word combinations, that do not exist in standard English or whose meanings differ from the words from which they were derived [source Wikipedia].
+<br>
+Each English "wasei" attribute has one or more associated English 
+terms or phrases.
+</li>
+</ul>
+
+
+
+</p>
+<p>
+All <b>attributes</b> appear in the JMdict/EDICT file as parenthetical annotations, enclosed in parentheses "(xx)"  except for "context" <b>attributes</b>, which are enclosed in curly brackets
+"{xx}".
+<br>
+Most <b>attributes</b> that support associated terms (the last four described above) may be followed by more than one, comma-delimited terms or phrases, for instance "(wasei: uniform, soldier)" or "(eng: coffee, dut: koffie)".
+
+
+</p>
+<h1>2. JMdict/EDICT entry examples</h1>
+<h3>A.  Example 1, multiple definitions, multiple meanings</h3>
+<p>
+In the following sample entry note these features
+<ul>
+<li>the entry has five definitions</li>
+<li>all of the definitions have multiple slash-delimited meanings, for instance "not very/not much" in definition number two.</li>
+<li>one of the definitions has an "xref" attributes, namely, "See ､｢､ﾞ､遙ｦ1" in definition number one.</li>
+<li>the entry ends with a JMdict/EDICT entry identifier of "EntL2670940".</li>
+
+</ul>
+<b>
+､｢､ﾞ､ｷ /(n,adj-no) (1) (See ､｢､ﾞ､遙ｦ1) remainder/remnant/rest/balance/surplus/remains (of a meal)/leftovers/(adv) (2) (with neg. sentence) not very/not much/(3) too much/excessively/overly/(adj-na,adj-no) (4) extreme/great/severe/tremendous/terrible/(n-suf) (5) more than/over/EntL2670940/
+</b>
+</p>
+<h3>B. Example 2, multiple attribute values</h3>
+<p>
+The following sample entry has two comma-delimited "wasei" attributes.
+</p>
+<p>
+<b>
+･ｳ･ﾃ･ﾚ･ﾑ･・/(n) bread roll (wasei: coupe, wasei: pao)/hot dog bun/EntL2070440X/
+</b>
+</p>
+
+<p>
+<h3>C. Example 3, context attribute</h3>
+In the following entry note that the one definition has a "context" attribute 
+in <u>curly brackets</u>, namely, "{math}".
+</p>
+<p>
+<b>
+｣ｬﾉﾛ [･ﾆ･｣｡ｼ､ﾖ､ﾗ] /(n) {math} t-distribution/EntL2827532/
+</b>
+</p>
+
+
+</body>
