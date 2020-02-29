@@ -11,12 +11,12 @@ import cvctw.db.transnook.TnProp;
 
 /**
  * <p>
- * Xref, meaning "cross reference"
- * </p>
- * <p>
- * This class implements the methods of the EdictEnum interface.
+ * This class represents the Xref (cross-reference) "attribute" and implements the methods of the EdictEnum interface.
  * <br>
  * See the EdictEnum javadoc item for a description of the purpose of each method.
+ * </p>
+ * <p>
+ * Xref means "cross reference"
  * </p>
  * @author minge
  *

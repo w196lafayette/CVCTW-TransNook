@@ -14,8 +14,10 @@ import java.sql.Statement;
 import com.mysql.cj.jdbc.MysqlDataSource;
 
 /**
- * A SINGLETON class
- * All clients will have one SQL connection
+ * This SINGLETON class handles all low-level SQL activities, e.g.,
+ * SQL Connection, SQL Statement and SQL ResultSet.
+ * The tnExecuteQuery and tnExecuteQuery convenience methods
+ * execute all SQL statements, including SELECT, INSERT and UPDATE.
  * 
  * @author minge
  *
@@ -23,7 +25,7 @@ import com.mysql.cj.jdbc.MysqlDataSource;
 public class TnConnection {
 
 	public static final String SET_AUTOCOMMIT_0 = "SET autocommit=0";
-	public static final String START_TRANSACTION = "START transaction";
+	public static final String START_TRANSACTION = "START TRANSACTION";
 	public static final String COMMIT = "COMMIT";
 	public static final String ROLLBACK = "ROLLBACK";
 

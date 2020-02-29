@@ -32,6 +32,27 @@ import cvctw.edict.Wasei;
 import cvctw.edict.Xref;
 
 /**
+ * <p>
+ * This class calls methods in other classes to read and parse the JMdict/EDICT Japanese-English dictionary,
+ * then calls its own methods to further parse and write each EdictEntry instance to the CVCTW TransNook database. 
+ * </p>
+ * <p>
+ * The constructor instantiates EdictReader and Dictionary classes to read and parse the dictionary.
+ * 
+ * </p>
+ * <p>
+ * For each EdictEntry instance of the dictionary, the dictToDb() method 
+ * <ul>
+ * <li>begins an SQL TRANSACTION</li>
+ * <li>writes the Entry to the database (SQL INSERT)</li>
+ * <li>makes the database insert permanent (SQL COMMIT).</li> 
+ * </ul>
+ * </p>
+ * <p>
+ * If the database operations fail more than the configured number of times,
+ * the application terminates.
+ * </p>
+ * 
  * @author minge
  *
  */
@@ -92,7 +113,7 @@ public class EdictToDatabase {
 				tnConnection.tnExecuteUpdate(TnConnection.ROLLBACK);
 				entryFailures++;
 				if (entryFailures > maxEntryFailures) {
-					System.err.println(entryFailures + " exceeds the max " + maxEntryFailures + ".  Exiting");
+					System.err.println(entryFailures + " failures exceeds the max " + maxEntryFailures + ".  Exiting");
 					throw e;
 				}
 			}

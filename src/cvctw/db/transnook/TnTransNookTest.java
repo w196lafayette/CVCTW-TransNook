@@ -28,12 +28,14 @@ import cvctw.edict.Language;
  *
  */
 public class TnTransNookTest {
+	private TnConnection tnConn = null;
 	private Connection conn = null;
 	public TnProp prop = null;
 	private TnRowReader rowReader = null;
 	private TnRowWriter rowWriter = null;
 
 	public TnTransNookTest() throws FileNotFoundException, IOException, SQLException {
+		tnConn = TnConnection.getInstance();
 		prop = TnProp.getInstance(); //TnProp.readProp("tnProperties.prop");
 		makeTools();
 	}
@@ -81,9 +83,24 @@ public class TnTransNookTest {
 	
 	}
 
+	public ArrayList<EdictEntry> readEntries() throws SQLException {
+		ArrayList<EdictEntry> ret = new ArrayList<EdictEntry>();
+		String query = TnRowReader.SQL_SELECT_STAR + TnProp.TABLE_ENTRIES;
+		ResultSet rs = tnConn.tnExecuteQuery(query);
+		// st.executeQuery(SQL_SELECT_STAR + TnProp.TABLE_ENTRIES);
+		EdictEntry e = null;
+		while(rs.next()) {
+			e = rowReader.rs2Entry(rs);
+			ret.add(e);
+		}
+		System.out.println("entry count=" + ret.size());
+		tnConn.tnCloseResultSet();
+		return ret;
+	}
+
 	public void tnReadEntries() throws SQLException {
 		ArrayList<EdictEntry> aT = new ArrayList<EdictEntry>();
-		aT = rowReader.readEntries();
+		aT = readEntries();
 		for (EdictEntry e : aT) {
 			System.out.println(e.entryOnly());
 		}

@@ -8,6 +8,9 @@ import java.util.TreeSet;
 import cvctw.db.transnook.TnProp;
 
 /**
+ * This class represents the Alphabet "attribute" and implements the methods of the EdictEnum interface.
+ * <br>
+ * See the EdictEnum javadoc item for a description of the purpose of each method.
  * @author minge
  *
  */
@@ -16,19 +19,19 @@ public class Alphabet implements EdictEnum {
 		kanji,
 		hiragana,
 		katakana,
-		CHINESE,
-		LATIN,
-		GREEK,
-		CYRILLIC,
-		ARMENIAN,
-		GEORGIAN,
-		HANGUL,
-		ARABIC,
-		HEBREW,
-		KOREAN,
-		EGYPTIAN_HIEROGLYPHIC,
-		MONGOLIAN,
-		COPTIC
+		chinese,
+		latin,
+		greek,
+		cyrillic,
+		armenian,
+		georgian,
+		hangul,
+		arabic,
+		hebrew,
+		korean,
+		egyptian_hieroglyphic,
+		mongolian,
+		coptic
 	}
 	// List of all enums that have been enumsWritten to the database
 	private static TreeSet<String> enumsWritten = null;

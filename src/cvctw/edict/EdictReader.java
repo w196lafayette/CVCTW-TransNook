@@ -11,6 +11,8 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 /**
+ * The constructor of this class reads the JMdict/EDICT Japanese-English dictionary into memory;
+ * the one remaining method allows clients to retrieve a copy of the dictionary's contents.
  * @author Fred Minger
  *
  */

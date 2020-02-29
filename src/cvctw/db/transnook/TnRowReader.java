@@ -18,6 +18,15 @@ import cvctw.edict.EdictTerm;
 import cvctw.edict.Source;
 
 /**
+ * This class provides methods
+ * <ul>
+ * <li>to read records (SQL SELECT) from the four "entities" tables, 
+ * namely, ENTRIES, TERMS, DEFINITIONS and MEANINGS,</li>
+ * <li>to unpack the returned SQL ResultSets, and</li>
+ * <li>to convert those results to instances of the four "entities" 
+ * classes, namely, EdictEntry, EdictTerm, EdictDefinition and EdictMeaning.</li>  
+ * 
+ * </ul>
  * @author minge
  *
  */
@@ -102,20 +111,6 @@ public class TnRowReader {
 		while(rs.next()) {
 			ret = rs.getInt(1);
 		}
-		tnConn.tnCloseResultSet();
-		return ret;
-	}
-	public ArrayList<EdictEntry> readEntries() throws SQLException {
-		ArrayList<EdictEntry> ret = new ArrayList<EdictEntry>();
-		String query = SQL_SELECT_STAR + TnProp.TABLE_ENTRIES;
-		ResultSet rs = tnConn.tnExecuteQuery(query);
-		// st.executeQuery(SQL_SELECT_STAR + TnProp.TABLE_ENTRIES);
-		EdictEntry e = null;
-		while(rs.next()) {
-			e = rs2Entry(rs);
-			ret.add(e);
-		}
-		System.out.println("entry count=" + ret.size());
 		tnConn.tnCloseResultSet();
 		return ret;
 	}

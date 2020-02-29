@@ -6,6 +6,10 @@ package cvctw.edict;
 import java.util.TreeSet;
 
 /**
+ * This class represents the Source "attribute" and implements the methods of the EdictEnum interface.
+ * <br>
+ * See the EdictEnum javadoc item for a description of the purpose of each method.
+ * 
  * @author minge
  *
  */

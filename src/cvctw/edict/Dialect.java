@@ -9,7 +9,7 @@ import cvctw.db.transnook.TnProp;
 
 /**
  * <p>
- * This class implements the methods of the EdictEnum interface.
+ * This class represents the Dialect "attribute" and implements the methods of the EdictEnum interface.
  * <br>
  * See the EdictEnum javadoc item for a description of the purpose of each method.
  * @author minge

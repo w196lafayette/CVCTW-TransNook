@@ -6,7 +6,8 @@ import java.io.IOException;
 import java.util.Properties;
 
 /**
- * This is a SINGLETON class.  All "clients" will read the same properties' values.
+ * This SINGLETON class reads the application's properties
+ * file and makes all of its values available to the application.
  * 
  * @author minge
  *

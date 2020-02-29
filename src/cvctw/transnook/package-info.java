@@ -1,7 +1,8 @@
 /**
  * <p>
- * The cvctw.transnook package contains one class, <i>EdictToDatabase</i>, which
- * creates the CVCTW TransNook database.  The class
+ * This package is part of the CVCTW TransNook project, making use of the other packages in the project
+ * to read and parse the JMdict/EDICT dictionary file and to create the CVCTW TransNook database.  
+ * The package contains only one class, <i>EdictToDatabase</i>
  * </p>
  * <ol>
  * <li>

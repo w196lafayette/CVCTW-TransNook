@@ -6,6 +6,10 @@ package cvctw.edict;
 import java.util.ArrayList;
 
 /**
+ * This class provides methods to parse the "raw" text of lines of the JMdict/EDICT Japanese-English dictionary
+ * and convert each line to instances of the full hierarchy of Entry-Term-Definition-Meaning Java objects.
+ * <br>
+ * The methods parse and return instances of all "entities" and all "attributes" of the dictionary.
  * @author minge
  *
  */
@@ -48,7 +52,7 @@ public class EdictParser {
 			// if ";" not found, returns an array of one entry
 			String[] terms = tokens[0].split(";");
 			for (int i = 0; i < terms.length; i++) {
-				EdictTerm t = getAnyTerm(terms[0]);
+				EdictTerm t = getAnyTerm(terms[i]);
 				t.type = EdictTerm.EdictTermType.major;
 				ret.add(t);
 			}

@@ -8,7 +8,7 @@ import java.util.TreeSet;
 import cvctw.db.transnook.TnProp;
 
 /**
- * This class implements the methods of the EdictEnum interface.
+ * This class represents the Sense "attribute" and implements the methods of the EdictEnum interface.
  * <br>
  * See the EdictEnum javadoc item for a description of the purpose of each method.
  * @author minge

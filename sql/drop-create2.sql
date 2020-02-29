@@ -1,5 +1,5 @@
 DROP DATABASE IF EXISTS transnook;
-CREATE DATABASE transnook;
+CREATE DATABASE transnook; --  COLLATE latin1_general_cs;
 USE transnook;
 -- 
 -- table=LANGUAGES
@@ -50,7 +50,7 @@ entry VARCHAR(4096) CHARACTER SET binary NOT NULL,
 language VARCHAR(64) NOT NULL,
 FOREIGN KEY (language) REFERENCES languages (language),
 eDictId VARCHAR(64),
-UNIQUE INDEX(edictID),
+UNIQUE INDEX (edictID),
 source CHAR(1),
 CONSTRAINT source_check CHECK (source in ('E','F','W'))
 );
@@ -68,7 +68,7 @@ term VARCHAR(512) CHARACTER SET binary NOT NULL,
 INDEX(term),
 alphabet VARCHAR(64) DEFAULT 'latin',
 FOREIGN KEY(alphabet) REFERENCES alphabets(alphabet),
--- UNIQUE INDEX(entryId,term,alphabet),
+UNIQUE INDEX (entryId,term,alphabet),
 termType CHAR NOT NULL,
 -- m=major, a=alternate
 CONSTRAINT term_type_check CHECK (termType IN ('m','a'))
@@ -80,7 +80,7 @@ CREATE TABLE readinginfo
 (
 id INTEGER NOT NULL AUTO_INCREMENT,
 PRIMARY KEY (id),
-info VARCHAR(32) NOT NULL,
+info VARCHAR(32) COLLATE latin1_general_cs NOT NULL,
 UNIQUE INDEX (info)
 );
 -- 
@@ -90,7 +90,7 @@ CREATE TABLE kanjiinfo
 (
 id INTEGER NOT NULL AUTO_INCREMENT,
 PRIMARY KEY (id),
-info VARCHAR(32) NOT NULL,
+info VARCHAR(32) COLLATE latin1_general_cs NOT NULL,
 UNIQUE INDEX (info)
 );
 -- 
@@ -102,7 +102,7 @@ id INTEGER NOT NULL AUTO_INCREMENT,
 PRIMARY KEY (id),
 termId INTEGER NOT NULL,
 FOREIGN KEY (termId) REFERENCES terms(id),
-info VARCHAR(32) NOT NULL,
+info VARCHAR(32) COLLATE latin1_general_cs NOT NULL,
 FOREIGN KEY (info) REFERENCES readinginfo(info),
 UNIQUE INDEX (termId,info)
 );
@@ -115,7 +115,7 @@ id INTEGER NOT NULL AUTO_INCREMENT,
 PRIMARY KEY (id),
 termId INTEGER NOT NULL,
 FOREIGN KEY (termId) REFERENCES terms(id),
-info VARCHAR(32) NOT NULL,
+info VARCHAR(32) COLLATE latin1_general_cs NOT NULL,
 FOREIGN KEY (info) REFERENCES kanjiinfo(info),
 UNIQUE INDEX (termId,info)
 );
@@ -151,7 +151,7 @@ meaningOrder INTEGER NOT NULL,
 UNIQUE INDEX (meaningOrder, defId),
 meaning VARCHAR(512) NOT NULL,
 INDEX (meaning)
-) CHARSET=utf8mb4;
+);
 -- 
 -- table=CONTEXT2MEANINGS
 -- 
@@ -263,7 +263,7 @@ lastName VARCHAR(128) NOT NULL,
 password VARCHAR(128) NOT NULL,
 email VARCHAR(128),
 PRIMARY KEY(id),
-UNIQUE INDEX userIdx(userId),
+UNIQUE INDEX (userId),
 INDEX nameIdx(lastName,firstName)
 );
 -- 
@@ -292,7 +292,7 @@ PRIMARY KEY (id),
 createdDate DATETIME DEFAULT CURRENT_TIMESTAMP,
 updatedDate DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, 
 projectId VARCHAR(128) NOT NULL,
-UNIQUE INDEX projIdx (projectId),
+UNIQUE INDEX (projectId),
 requestor VARCHAR(128) NOT NULL,
 FOREIGN KEY (requestor) REFERENCES users(userId),
 dueDate DATE,
@@ -308,4 +308,4 @@ translatedText LONGTEXT,
 translatedLanguage VARCHAR(64),
 FOREIGN KEY (translatedLanguage) REFERENCES languages(language),
 FOREIGN KEY (translator,sourceLanguage,translatedLanguage) REFERENCES translators2languages(user,fromLanguage,toLanguage)
-) CHARSET=utf8mb4;
+);

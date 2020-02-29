@@ -13,13 +13,21 @@ import cvctw.edict.EdictMeaning;
 import cvctw.edict.EdictTerm;
 
 /**
+ * This class provides 
+ * <ul>
+ * <li>methods to write (SQL INSERT) records to the four "entities" tables, namely,
+ * ENTRIES, TERMS, DEFINITIONS and MEANINGS.</li>
+ * <li>a general-purpose method to write records to the requested table.</li>
+ * 
+ * </ul>
+ * 
  * @author minge
  *
  */
 public class TnRowWriter {
 
-	TnRowReader rowReader = null;
-	TnConnection tnConn = null;
+	private TnRowReader rowReader = null;
+	private TnConnection tnConn = null;
 
 	public TnRowWriter() throws SQLException, FileNotFoundException, IOException {
 		this.tnConn = TnConnection.getInstance();
@@ -27,7 +35,7 @@ public class TnRowWriter {
 	}
 
 	public Integer writeEntry(EdictEntry e, char source) throws SQLException {
-		String inst = "INSERT INTO " + TnProp.SCHEMA + "." + EdictEntry.getTable() + // TnProp.TABLE_ENTRIES + 
+		String inst = "INSERT INTO " + TnProp.SCHEMA + "." + EdictEntry.getTable() + 
 				EdictEntry.getColumnList() + " VALUES ('" +
 				e.entry + "','" + e.language + "','" + e.eDictId + "','" + source + "')";
 		Integer newId = tnConn.tnExecuteUpdate(inst);
@@ -41,25 +49,25 @@ public class TnRowWriter {
 		}
 		// Grab only the first character of term type
 		String termType = t.type.name().substring(0,1);
-		String inst = "INSERT INTO " + TnProp.SCHEMA + "." + EdictTerm.getTable() + // TnProp.TABLE_TERMS +
+		String inst = "INSERT INTO " + TnProp.SCHEMA + "." + EdictTerm.getTable() +
 				EdictTerm.getColumnList() + " VALUES (" +
 				realEntryId + /* "," + realId + */ ",'" + t.term + "','" + t.alphabetE + "','" + termType + "')";
-		try {
+//		try {
 			Integer newId = tnConn.tnExecuteUpdate(inst);
 			// return the id of the Term just created
 			return newId;
-		} catch (java.sql.SQLIntegrityConstraintViolationException e) {
-			System.err.println("Term for Entry=" + realEntryId + " failed as DUPLICATE.  Term=" + t.term);
-			System.err.println(e);
-			return null;
-		}
+//		} catch (java.sql.SQLIntegrityConstraintViolationException e) {
+//			System.err.println("Term for Entry=" + realEntryId + " failed as DUPLICATE.  Term=" + t.term);
+//			System.err.println(e);
+//			return null;
+//		}
 	}
 	public Integer writeDefinition(EdictDefinition d) throws SQLException {
 		Integer realEntryId = d.entryId;
 		if (d.entryId == null) {
 			realEntryId = rowReader.readMaxId(EdictDefinition.getParentTable()) + 1;
 		}
-		String inst = "INSERT INTO " + TnProp.SCHEMA + "." + EdictDefinition.getTable() + // TnProp.TABLE_DEFINITIONS +
+		String inst = "INSERT INTO " + TnProp.SCHEMA + "." + EdictDefinition.getTable() + 
 				EdictDefinition.getColumnList() + " VALUES (" +
 				realEntryId + "," + d.defOrder + ",'" + d.definition + "','" + d.language + "')";
 		Integer newId = tnConn.tnExecuteUpdate(inst);
@@ -71,7 +79,7 @@ public class TnRowWriter {
 		if (m.defId == null) {
 			realDefId = rowReader.readMaxId(EdictMeaning.getParentTable()) + 1;
 		}
-		String inst = "INSERT INTO " + TnProp.SCHEMA + "." + EdictMeaning.getTable() + // TnProp.TABLE_MEANINGS +
+		String inst = "INSERT INTO " + TnProp.SCHEMA + "." + EdictMeaning.getTable() + 
 				EdictMeaning.getColumnList() + " VALUES (" +
 				m.entryId + "," + realDefId + "," + m.meaningOrder + ",'" + m.meaning + "')";
 		Integer newId = tnConn.tnExecuteUpdate(inst);
@@ -93,7 +101,7 @@ public class TnRowWriter {
 		return newId;
 	}
 
-	public Integer writeRow(String table, String columnList, String valueList, boolean isString) throws SQLException  {
+	public Integer writeRow(String table, String columnList, String valueList, boolean isString) throws SQLException   {
 		Integer rowId = null;
 		String newVal = null;
 		if (isString == true) {
@@ -103,7 +111,12 @@ public class TnRowWriter {
 		}
 		String inst = "INSERT INTO " + TnProp.SCHEMA + "." + table +
 				" (" + columnList + ") VALUES (" + newVal + ")";
+		try {
 		rowId = tnConn.tnExecuteUpdate(inst);
+		} catch (SQLException e) {
+			System.out.println ("INSERT failed: " + inst);
+			throw e;
+		}
 		return rowId;
 	}
 }
